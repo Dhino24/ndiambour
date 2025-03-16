@@ -5,7 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestionnaire d'Images - AutoSénégal</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
+<!-- Ajouter dans le <head> de vos pages admin -->
+    <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cloudinary-core/2.11.4/cloudinary-core-shrinkwrap.min.js"></script>
+    <script src="https://widget.cloudinary.com/v2.0/global/all.js" type="text/javascript"></script>
+
+
+   <style>
         /* Variables et réinitialisation */
         :root {
             --primary-color: #007C5A; /* Vert, couleur du drapeau sénégalais */
@@ -694,17 +700,28 @@
                     </div>
 
                     <!-- Upload Container -->
-                    <div class="upload-container" id="uploadArea">
-                        <div class="upload-icon">
-                            <i class="fas fa-cloud-upload-alt"></i>
-                        </div>
-                        <div class="upload-text">
-                            <h3>Télécharger des images</h3>
-                            <p>Glissez-déposez vos images ici ou cliquez pour parcourir vos fichiers</p>
-                        </div>
-                        <button class="upload-btn" id="browseFiles">Parcourir les fichiers</button>
-                        <input type="file" id="fileInput" class="file-input" multiple accept="image/*">
-                    </div>
+                    <!-- Section d'upload avec Cloudinary -->
+<div class="upload-container" id="cloudinaryUploadArea">
+    <div class="upload-icon">
+      <i class="fas fa-cloud-upload-alt"></i>
+    </div>
+    <div class="upload-text">
+      <h3>Télécharger des images</h3>
+      <p>Glissez-déposez vos images ici ou cliquez pour sélectionner des fichiers</p>
+    </div>
+    <button class="upload-btn" id="cloudinaryUploadBtn">Parcourir les fichiers</button>
+  </div>
+  
+  <!-- Ajouter un champ pour choisir la catégorie avant l'upload -->
+  <div class="form-group" style="margin-bottom: 20px;">
+    <label for="uploadCategory">Catégorie des images à télécharger</label>
+    <select id="uploadCategory" class="form-control">
+      <option value="vehicles">Véhicules</option>
+      <option value="interiors">Intérieurs</option>
+      <option value="exteriors">Extérieurs</option>
+      <option value="others">Autres</option>
+    </select>
+  </div>
 
                     <!-- Images Filters -->
                     <div class="images-filters">
@@ -827,925 +844,10 @@
 
     <!-- JavaScript - Système de gestion d'images dynamique -->
     <script>
-    // ==============================================
-    // SYSTÈME DE GESTION D'IMAGES DYNAMIQUE
-    // ==============================================
-
-    // Structure des données dans localStorage
-    // images: Collection d'images avec métadonnées
-    // vehicles: Collection de véhicules avec leurs images associées
-    // categories: Collection de catégories d'images
-
-    // ==============================================
-    // GESTION DES DONNÉES
-    // ==============================================
-
-    // Modèle de données pour une nouvelle image
-    function createImageModel(file, metadata = {}) {
-    const id = 'img-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
-    const fileName = file instanceof File ? file.name : (metadata.fileName || 'image.jpg');
-    const fileType = fileName.split('.').pop().toUpperCase();
-    
-    // Créer un objet image avec les métadonnées de base
-    const imageObject = {
-        id: id,
-        fileName: fileName,
-        alt: metadata.alt || fileName,
-        category: metadata.category || 'others',
-        type: fileType,
-        size: file instanceof File ? formatFileSize(file.size) : (metadata.size || 'Inconnu'),
-        dimensions: metadata.dimensions || 'Inconnu',
-        dateAdded: new Date().toISOString(),
-        vehicleId: metadata.vehicleId || null,
-        vehicleName: metadata.vehicleName || ''
-    };
-    
-    // Si une src est fournie dans les métadonnées, l'utiliser directement
-    if (metadata.src) {
-        imageObject.src = metadata.src;
-        return imageObject;
-    }
-    
-    // Sinon, si un fichier est fourni, convertir en Base64
-    if (file instanceof File) {
-        // Retourner une promesse avec l'objet image
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            
-            reader.onload = function(e) {
-                // Assigner le résultat Base64 comme src
-                imageObject.src = e.target.result;
-                
-                // Déterminer les dimensions de l'image
-                const img = new Image();
-                img.onload = function() {
-                    imageObject.dimensions = `${img.width} × ${img.height}`;
-                    resolve(imageObject);
-                };
-                
-                img.onerror = function() {
-                    console.error("Erreur lors du chargement de l'image pour déterminer les dimensions");
-                    imageObject.dimensions = 'Inconnu';
-                    resolve(imageObject);
-                };
-                
-                img.src = e.target.result;
-            };
-            
-            reader.onerror = function() {
-                console.error("Erreur lors de la lecture du fichier");
-                reject(new Error("Erreur lors de la lecture du fichier"));
-            };
-            
-            // Lire le fichier comme une URL de données (Base64)
-            reader.readAsDataURL(file);
-        });
-    }
-    
-    return imageObject;
-}
-
-    // Formater la taille du fichier
-    function formatFileSize(bytes) {
-        if (bytes < 1024) return bytes + ' bytes';
-        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-        return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
-    }
-
-    // Initialiser les données de base si elles n'existent pas
-    function initializeData() {
-        // Vérifier si les données existent déjà
-        if (!localStorage.getItem('autosenegal_images')) {
-            // Données d'images initiales
-            const initialImages = [];
-            
-            // Données de catégories initiales
-            const initialCategories = [
-                { id: 'vehicles', name: 'Véhicules', icon: 'fas fa-car', count: 0 },
-                { id: 'interiors', name: 'Intérieurs', icon: 'fas fa-couch', count: 0 },
-                { id: 'exteriors', name: 'Extérieurs', icon: 'fas fa-car-side', count: 0 },
-                { id: 'others', name: 'Autres', icon: 'fas fa-images', count: 0 }
-            ];
-            
-            // Données de véhicules initiales 
-            // (vides car vous allez les ajouter dynamiquement)
-            const initialVehicles = [];
-            
-            // Sauvegarder les données initiales
-            localStorage.setItem('autosenegal_images', JSON.stringify(initialImages));
-            localStorage.setItem('autosenegal_categories', JSON.stringify(initialCategories));
-            localStorage.setItem('autosenegal_vehicles', JSON.stringify(initialVehicles));
-        }
-    }
-
-    // Obtenir toutes les images
-    function getAllImages() {
-        const images = JSON.parse(localStorage.getItem('autosenegal_images') || '[]');
-        return images;
-    }
-
-    // Obtenir les images par catégorie
-    function getImagesByCategory(category) {
-        const images = getAllImages();
-        return category === 'all' ? images : images.filter(img => img.category === category);
-    }
-
-    // Obtenir les images par véhicule
-    function getImagesByVehicle(vehicleId) {
-        const images = getAllImages();
-        return images.filter(img => img.vehicleId === vehicleId);
-    }
-
-    // Ajouter une nouvelle image
-    async function addImage(file, metadata = {}) {
-    try {
-        // Créer un nouvel objet image (maintenant asynchrone)
-        const newImage = await createImageModel(file, metadata);
-        
-        // Récupérer et mettre à jour la collection d'images
-        const images = getAllImages();
-        images.push(newImage);
-        localStorage.setItem('autosenegal_images', JSON.stringify(images));
-        
-        // Mettre à jour le compteur de catégorie
-        updateCategoryCount(newImage.category, 1);
-        
-        // Si l'image est associée à un véhicule, mettre à jour le véhicule
-        if (newImage.vehicleId) {
-            addImageToVehicle(newImage.id, newImage.vehicleId);
-        }
-        
-        return newImage;
-    } catch (error) {
-        console.error("Erreur lors de l'ajout de l'image:", error);
-        return null;
-    }
-}
-
-    // Supprimer une image
-    function deleteImage(imageId) {
-        // Récupérer l'image
-        const images = getAllImages();
-        const imageIndex = images.findIndex(img => img.id === imageId);
-        
-        if (imageIndex === -1) return false;
-        
-        const deletedImage = images[imageIndex];
-        
-        // Supprimer l'image de la collection
-        images.splice(imageIndex, 1);
-        localStorage.setItem('autosenegal_images', JSON.stringify(images));
-        
-        // Mettre à jour le compteur de catégorie
-        updateCategoryCount(deletedImage.category, -1);
-        
-        // Si l'image était associée à un véhicule, mettre à jour le véhicule
-        if (deletedImage.vehicleId) {
-            removeImageFromVehicle(imageId, deletedImage.vehicleId);
-        }
-        
-        return true;
-    }
-
-    // Mettre à jour une image
-    function updateImage(imageId, updates) {
-        // Récupérer l'image
-        const images = getAllImages();
-        const imageIndex = images.findIndex(img => img.id === imageId);
-        
-        if (imageIndex === -1) return false;
-        
-        const oldImage = {...images[imageIndex]};
-        
-        // Mettre à jour l'image
-        images[imageIndex] = {...oldImage, ...updates};
-        localStorage.setItem('autosenegal_images', JSON.stringify(images));
-        
-        // Si la catégorie a changé, mettre à jour les compteurs
-        if (updates.category && updates.category !== oldImage.category) {
-            updateCategoryCount(oldImage.category, -1);
-            updateCategoryCount(updates.category, 1);
-        }
-        
-        // Si le véhicule a changé, mettre à jour les associations
-        if (updates.vehicleId && updates.vehicleId !== oldImage.vehicleId) {
-            if (oldImage.vehicleId) {
-                removeImageFromVehicle(imageId, oldImage.vehicleId);
-            }
-            if (updates.vehicleId) {
-                addImageToVehicle(imageId, updates.vehicleId);
-            }
-        }
-        
-        return images[imageIndex];
-    }
-
-    // Obtenir toutes les catégories
-    function getAllCategories() {
-        const categories = JSON.parse(localStorage.getItem('autosenegal_categories') || '[]');
-        return categories;
-    }
-
-    // Mettre à jour le compteur d'une catégorie
-    function updateCategoryCount(categoryId, delta) {
-        const categories = getAllCategories();
-        const categoryIndex = categories.findIndex(cat => cat.id === categoryId);
-        
-        if (categoryIndex === -1) return false;
-        
-        categories[categoryIndex].count += delta;
-        if (categories[categoryIndex].count < 0) categories[categoryIndex].count = 0;
-        
-        localStorage.setItem('autosenegal_categories', JSON.stringify(categories));
-        return true;
-    }
-
-    // Obtenir tous les véhicules
-    function getAllVehicles() {
-        const vehicles = JSON.parse(localStorage.getItem('autosenegal_vehicles') || '[]');
-        return vehicles;
-    }
-
-    // Ajouter une image à un véhicule
-    function addImageToVehicle(imageId, vehicleId) {
-        const vehicles = getAllVehicles();
-        const vehicleIndex = vehicles.findIndex(v => v.id === vehicleId);
-        
-        if (vehicleIndex === -1) return false;
-        
-        if (!vehicles[vehicleIndex].images) {
-            vehicles[vehicleIndex].images = [];
-        }
-        
-        if (!vehicles[vehicleIndex].images.includes(imageId)) {
-            vehicles[vehicleIndex].images.push(imageId);
-            localStorage.setItem('autosenegal_vehicles', JSON.stringify(vehicles));
-        }
-        
-        return true;
-    }
-
-    // Supprimer une image d'un véhicule
-    function removeImageFromVehicle(imageId, vehicleId) {
-        const vehicles = getAllVehicles();
-        const vehicleIndex = vehicles.findIndex(v => v.id === vehicleId);
-        
-        if (vehicleIndex === -1 || !vehicles[vehicleIndex].images) return false;
-        
-        const imageIndex = vehicles[vehicleIndex].images.indexOf(imageId);
-        if (imageIndex > -1) {
-            vehicles[vehicleIndex].images.splice(imageIndex, 1);
-            localStorage.setItem('autosenegal_vehicles', JSON.stringify(vehicles));
-        }
-        
-        return true;
-    }
-
-    // ==============================================
-    // INTERFACE UTILISATEUR
-    // ==============================================
-
-    // Générer la galerie d'images
-    function renderImageGallery(category = 'all') {
-        const imageGallery = document.querySelector('.image-gallery');
-        if (!imageGallery) return;
-        
-        // Vider la galerie
-        imageGallery.innerHTML = '';
-        
-        // Obtenir les images à afficher
-        const images = getImagesByCategory(category);
-        
-        if (images.length === 0) {
-            // Afficher un message si aucune image n'est disponible
-            imageGallery.innerHTML = `
-                <div class="empty-gallery">
-                    <i class="fas fa-images" style="font-size: 3rem; color: #ccc; margin-bottom: 15px;"></i>
-                    <p>Aucune image disponible dans cette catégorie.</p>
-                    <p>Utilisez le bouton "Parcourir les fichiers" pour ajouter des images.</p>
-                </div>
-            `;
-            return;
-        }
-        
-        // Générer une carte pour chaque image
-        images.forEach(image => {
-            const imageCard = createImageCard(image);
-            imageGallery.appendChild(imageCard);
-        });
-        
-        // Mettre à jour le compteur d'images sélectionnées
-        updateSelectedCount();
-    }
-
-    // Créer une carte d'image
-    function createImageCard(image) {
-        // Créer l'élément div pour la carte
-        const card = document.createElement('div');
-        card.className = 'image-card';
-        card.setAttribute('data-category', image.category);
-        card.setAttribute('data-id', image.id);
-        
-        // Définir le contenu HTML de la carte
-        card.innerHTML = `
-            <img src="${image.src}" alt="${image.alt}" class="image-thumbnail">
-            <div class="image-checkbox" data-id="${image.id}"></div>
-            <div class="image-actions">
-                <button class="image-action" title="Voir" data-image-id="${image.id}"><i class="fas fa-eye"></i></button>
-                <button class="image-action" title="Éditer" data-image-id="${image.id}"><i class="fas fa-edit"></i></button>
-                <button class="image-action" title="Supprimer" data-image-id="${image.id}"><i class="fas fa-trash-alt"></i></button>
-            </div>
-            <div class="image-info">
-                <h3 class="image-title">${image.fileName}</h3>
-                <div class="image-meta">
-                    <span>${image.type} • ${image.size}</span>
-                    <span>${image.dimensions}</span>
-                </div>
-            </div>
-        `;
-        
-        // Configurer les événements pour les boutons d'action
-        setupImageCardEvents(card);
-        
-        return card;
-    }
-
-    // Configurer les événements pour une carte d'image
-    function setupImageCardEvents(cardElement) {
-        // Checkbox pour sélection
-        const checkbox = cardElement.querySelector('.image-checkbox');
-        if (checkbox) {
-            checkbox.addEventListener('click', function() {
-                this.classList.toggle('checked');
-                updateSelectedCount();
-            });
-        }
-        
-        // Boutons d'action
-        const actionButtons = cardElement.querySelectorAll('.image-action');
-        actionButtons.forEach(button => {
-            button.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                const action = this.getAttribute('title');
-                const imageId = this.getAttribute('data-image-id');
-                
-                handleImageAction(action, imageId, this);
-            });
-        });
-    }
-
-    // Mettre à jour les cartes de catégories
-    function renderCategoryCards() {
-        const categoriesList = document.querySelector('.categories-list');
-        if (!categoriesList) return;
-        
-        // Vider la liste
-        categoriesList.innerHTML = '';
-        
-        // Obtenir les catégories
-        const categories = getAllCategories();
-        
-        // Générer une carte pour chaque catégorie
-        categories.forEach(category => {
-            const categoryCard = document.createElement('div');
-            categoryCard.className = 'category-card';
-            categoryCard.innerHTML = `
-                <div class="category-icon">
-                    <i class="${category.icon}"></i>
-                </div>
-                <h3 class="category-title">${category.name}</h3>
-                <div class="category-count">${category.count} image${category.count !== 1 ? 's' : ''}</div>
-            `;
-            categoriesList.appendChild(categoryCard);
-        });
-    }
-
-    // Mettre à jour le compteur d'images sélectionnées
-    function updateSelectedCount() {
-        const checkedBoxes = document.querySelectorAll('.image-checkbox.checked');
-        const countElement = document.querySelector('.selected-count');
-        const batchButtons = document.querySelectorAll('.batch-buttons button');
-        
-        if (countElement) {
-            const count = checkedBoxes.length;
-            countElement.textContent = `${count} image${count !== 1 ? 's' : ''} sélectionnée${count !== 1 ? 's' : ''}`;
-        }
-        
-        // Activer/désactiver les boutons d'action par lot
-        batchButtons.forEach(button => {
-            button.disabled = checkedBoxes.length === 0;
-        });
-    }
-
-    // Gérer l'action sur une image
-    function handleImageAction(action, imageId, buttonElement) {
-        const images = getAllImages();
-        const image = images.find(img => img.id === imageId);
-        
-        if (!image) return;
-        
-        switch(action) {
-            case 'Voir':
-                openImageDetailModal(image);
-                break;
-            case 'Éditer':
-                openImageEditModal(image);
-                break;
-            case 'Supprimer':
-                confirmImageDeletion(image, buttonElement);
-                break;
-        }
-    }
-
-    // Ouvrir le modal de détails d'image
-    function openImageDetailModal(image) {
-        const modal = document.getElementById('imageDetailModal');
-        if (!modal) return;
-        
-        // Mettre à jour le contenu du modal
-        const previewImg = document.getElementById('previewImg');
-        const fileName = document.getElementById('fileName');
-        const fileType = document.getElementById('fileType');
-        const fileSize = document.getElementById('fileSize');
-        const fileDimensions = document.getElementById('fileDimensions');
-        const altText = document.getElementById('altText');
-        const imageCategory = document.getElementById('imageCategory');
-        
-        if (previewImg) previewImg.src = image.src;
-        if (fileName) fileName.textContent = image.fileName;
-        if (fileType) fileType.textContent = image.type;
-        if (fileSize) fileSize.textContent = image.size;
-        if (fileDimensions) fileDimensions.textContent = image.dimensions;
-        if (altText) altText.value = image.alt;
-        if (imageCategory) {
-            const options = imageCategory.querySelectorAll('option');
-            options.forEach(option => {
-                option.selected = option.value === image.category;
-            });
-        }
-        
-        // Ajouter l'ID de l'image au modal pour le récupérer lors de la sauvegarde
-        modal.setAttribute('data-image-id', image.id);
-        
-        // Afficher le modal
-        modal.classList.add('active');
-    }
-
-    // Ouvrir le modal d'édition d'image
-    function openImageEditModal(image) {
-        // Utiliser le même modal que pour les détails
-        openImageDetailModal(image);
-    }
-
-    // Confirmer la suppression d'une image
-    function confirmImageDeletion(image, buttonElement) {
-        if (confirm(`Êtes-vous sûr de vouloir supprimer l'image "${image.fileName}" ?`)) {
-            // Supprimer l'image de la base de données
-            const success = deleteImage(image.id);
-            
-            if (success) {
-                // Supprimer la carte de l'image de l'interface
-                const imageCard = buttonElement.closest('.image-card');
-                if (imageCard) {
-                    imageCard.remove();
-                }
-                
-                // Mettre à jour les catégories
-                renderCategoryCards();
-                
-                alert(`Image "${image.fileName}" supprimée avec succès!`);
-            } else {
-                alert("Erreur lors de la suppression de l'image.");
-            }
-        }
-    }
-
-    // Gérer la soumission du formulaire d'édition d'image
-    function handleImageFormSubmit(event) {
-        event.preventDefault();
-        
-        const modal = document.getElementById('imageDetailModal');
-        if (!modal) return;
-        
-        const imageId = modal.getAttribute('data-image-id');
-        if (!imageId) return;
-        
-        // Récupérer les nouvelles valeurs
-        const altText = document.getElementById('altText')?.value;
-        const imageCategory = document.getElementById('imageCategory')?.value;
-        
-        // Mettre à jour l'image
-        const updatedImage = updateImage(imageId, {
-            alt: altText,
-            category: imageCategory
-        });
-        
-        if (updatedImage) {
-            // Mettre à jour l'interface
-            renderImageGallery();
-            renderCategoryCards();
-            
-            // Fermer le modal
-            modal.classList.remove('active');
-            
-            alert('Modifications enregistrées avec succès!');
-        } else {
-            alert("Erreur lors de la mise à jour de l'image.");
-        }
-    }
-
-    // Gérer l'upload de fichiers
-   // Modifier la fonction handleFileUpload pour gérer l'asynchronicité
-async function handleFileUpload(files) {
-    if (!files || files.length === 0) return;
-    
-    // Vérifier le type et la taille des fichiers
-    const validFiles = Array.from(files).filter(file => 
-        file.type.startsWith('image/') && file.size <= 10 * 1024 * 1024 // Limite à 10 Mo
-    );
-    
-    if (validFiles.length === 0) {
-        alert('Aucun fichier valide sélectionné. Les fichiers doivent être des images de moins de 10 Mo.');
-        return;
-    }
-    
-    // Afficher une popup pour sélectionner la catégorie
-    const category = prompt('Sélectionnez une catégorie pour ces images :\n- vehicles\n- interiors\n- exteriors\n- others', 'vehicles');
-    if (!category) return;
-    
-    // Si l'utilisateur a sélectionné une catégorie valide
-    if (['vehicles', 'interiors', 'exteriors', 'others'].includes(category)) {
-        // Afficher un indicateur de chargement
-        showLoading(true, `Chargement de ${validFiles.length} image(s)...`);
-        
-        try {
-            // Ajouter chaque fichier
-            const addedImages = [];
-            
-            // Utiliser une boucle for...of pour gérer l'asynchronicité
-            for (const file of validFiles) {
-                // Ajouter l'image avec des métadonnées de base
-                const metadata = {
-                    category: category,
-                    alt: file.name.replace(/\.[^/.]+$/, '') // Nom du fichier sans extension
-                };
-                
-                const newImage = await addImage(file, metadata);
-                if (newImage) {
-                    addedImages.push(newImage);
-                }
-            }
-            
-            // Mettre à jour l'interface
-            renderImageGallery();
-            renderCategoryCards();
-            
-            alert(`${addedImages.length} image(s) ajoutée(s) avec succès!`);
-        } catch (error) {
-            console.error("Erreur lors du traitement des fichiers:", error);
-            alert("Une erreur s'est produite lors du chargement des images.");
-        } finally {
-            // Masquer l'indicateur de chargement
-            showLoading(false);
-        }
-    } else {
-        alert('Catégorie non valide. Veuillez sélectionner une catégorie parmi: vehicles, interiors, exteriors, others.');
-    }
-}
-
-// Fonction pour afficher/masquer un indicateur de chargement
-function showLoading(show, message = "Chargement...") {
-    let loadingElement = document.getElementById('loading-indicator');
-    
-    // Si l'élément n'existe pas, le créer
-    if (!loadingElement && show) {
-        loadingElement = document.createElement('div');
-        loadingElement.id = 'loading-indicator';
-        loadingElement.style.position = 'fixed';
-        loadingElement.style.top = '0';
-        loadingElement.style.left = '0';
-        loadingElement.style.width = '100%';
-        loadingElement.style.height = '100%';
-        loadingElement.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-        loadingElement.style.display = 'flex';
-        loadingElement.style.justifyContent = 'center';
-        loadingElement.style.alignItems = 'center';
-        loadingElement.style.zIndex = '9999';
-        
-        const loadingContent = document.createElement('div');
-        loadingContent.style.backgroundColor = 'white';
-        loadingContent.style.padding = '20px';
-        loadingContent.style.borderRadius = '10px';
-        loadingContent.style.textAlign = 'center';
-        
-        const spinner = document.createElement('div');
-        spinner.innerHTML = '<i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: #007C5A; margin-bottom: 10px;"></i>';
-        
-        const messageElement = document.createElement('p');
-        messageElement.id = 'loading-message';
-        messageElement.textContent = message;
-        
-        loadingContent.appendChild(spinner);
-        loadingContent.appendChild(messageElement);
-        loadingElement.appendChild(loadingContent);
-        
-        document.body.appendChild(loadingElement);
-    } else if (loadingElement) {
-        if (show) {
-            // Mettre à jour le message si nécessaire
-            const messageElement = loadingElement.querySelector('#loading-message');
-            if (messageElement) {
-                messageElement.textContent = message;
-            }
-            
-            loadingElement.style.display = 'flex';
-        } else {
-            loadingElement.style.display = 'none';
-        }
-    }
-}
-
-// Modifier la gestion des erreurs d'image
-function setupImageErrorHandler(imgElement) {
-    imgElement.addEventListener('error', function() {
-        console.warn(`Impossible de charger l'image: ${this.src}`);
-        
-        // Vérifier si c'est une image en Base64
-        if (this.src.startsWith('data:image/')) {
-            console.log("L'image est en Base64 mais ne peut pas être chargée, peut-être corrompue");
-        }
-        
-        // Remplacer par un placeholder
-        this.src = 'https://via.placeholder.com/150x100?text=' + encodeURIComponent('Image non disponible');
-        this.classList.add('broken-image');
-    });
-}
-
-    // ==============================================
-    // INITIALISATION
-    // ==============================================
-
-    // Fonction principale d'initialisation
-    function initializeDynamicImageManagement() {
-        console.log("Initialisation du gestionnaire d'images dynamique...");
-        
-        // Initialiser les données si nécessaire
-        initializeData();
-        
-        // Configurer l'interface utilisateur
-        setupUI();
-        
-        // Rendre les éléments d'interface initiaux
-        renderImageGallery();
-        renderCategoryCards();
-        
-        console.log("Gestionnaire d'images dynamique initialisé avec succès!");
-    }
-
-    // Configurer l'interface utilisateur
-    function setupUI() {
-        // Configuration des onglets de catégorie
-        setupTabs();
-        
-        // Configuration de l'upload de fichiers
-        setupFileUpload();
-        
-        // Configuration des actions par lot
-        setupBatchActions();
-        
-        // Configuration des modals
-        setupModals();
-        
-        // Configuration de la recherche
-        setupSearch();
-    }
-
-    // Configurer les onglets
-    function setupTabs() {
-        const tabs = document.querySelectorAll('.tab');
-        tabs.forEach(tab => {
-            tab.addEventListener('click', function() {
-                // Retirer la classe active de tous les onglets
-                tabs.forEach(t => t.classList.remove('active'));
-                
-                // Ajouter la classe active à l'onglet cliqué
-                this.classList.add('active');
-                
-                // Filtrer les images par catégorie
-                const category = this.getAttribute('data-tab');
-                renderImageGallery(category);
-            });
-        });
-    }
-
-    // Configurer l'upload de fichiers
-    function setupFileUpload() {
-        const uploadArea = document.getElementById('uploadArea');
-        const browseFiles = document.getElementById('browseFiles');
-        const fileInput = document.getElementById('fileInput');
-        
-        if (browseFiles && fileInput) {
-            browseFiles.addEventListener('click', () => {
-                fileInput.click();
-            });
-        }
-        
-        if (fileInput) {
-            fileInput.addEventListener('change', () => {
-                if (fileInput.files.length > 0) {
-                    handleFileUpload(fileInput.files);
-                }
-            });
-        }
-        
-        if (uploadArea) {
-            uploadArea.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                uploadArea.style.borderColor = '#007C5A';
-                uploadArea.style.backgroundColor = 'rgba(0, 124, 90, 0.05)';
-            });
-            
-            uploadArea.addEventListener('dragleave', () => {
-                uploadArea.style.borderColor = 'rgba(0, 0, 0, 0.1)';
-                uploadArea.style.backgroundColor = '#F5F5F5';
-            });
-            
-            uploadArea.addEventListener('drop', (e) => {
-                e.preventDefault();
-                uploadArea.style.borderColor = 'rgba(0, 0, 0, 0.1)';
-                uploadArea.style.backgroundColor = '#F5F5F5';
-                
-                if (e.dataTransfer.files.length > 0) {
-                    handleFileUpload(e.dataTransfer.files);
-                }
-            });
-        }
-    }
-
-    // Configurer les actions par lot
-    function setupBatchActions() {
-        const assignCategoryBtn = document.getElementById('assignCategoryBtn');
-        const downloadBtn = document.getElementById('downloadBtn');
-        const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
-        
-        if (assignCategoryBtn) {
-            assignCategoryBtn.addEventListener('click', () => {
-                const checkedBoxes = document.querySelectorAll('.image-checkbox.checked');
-                if (checkedBoxes.length === 0) return;
-                
-                const category = prompt('Sélectionnez une catégorie: vehicles, interiors, exteriors, others');
-                if (category && ['vehicles', 'interiors', 'exteriors', 'others'].includes(category)) {
-                    let updatedCount = 0;
-                    
-                    checkedBoxes.forEach(checkbox => {
-                        const imageId = checkbox.getAttribute('data-id');
-                        if (updateImage(imageId, { category })) {
-                            updatedCount++;
-                        }
-                    });
-                    
-                    // Mettre à jour l'interface
-                    renderImageGallery();
-                    renderCategoryCards();
-                    
-                    alert(`${updatedCount} image(s) assignée(s) à la catégorie "${category}"`);
-                } else if (category) {
-                    alert('Catégorie non valide. Veuillez sélectionner une catégorie parmi: vehicles, interiors, exteriors, others.');
-                }
-            });
-        }
-        
-        if (downloadBtn) {
-            downloadBtn.addEventListener('click', () => {
-                const checkedBoxes = document.querySelectorAll('.image-checkbox.checked');
-                if (checkedBoxes.length === 0) return;
-                
-                // Dans une application réelle, vous pourriez créer un zip
-                // Pour cette démo, nous ouvrons simplement chaque image dans un nouvel onglet
-                const images = getAllImages();
-                
-                checkedBoxes.forEach(checkbox => {
-                    const imageId = checkbox.getAttribute('data-id');
-                    const image = images.find(img => img.id === imageId);
-                    
-                    if (image && image.src) {
-                        window.open(image.src, '_blank');
-                    }
-                });
-                
-                alert(`${checkedBoxes.length} image(s) ouvertes pour téléchargement.`);
-            });
-        }
-        
-        if (deleteSelectedBtn) {
-            deleteSelectedBtn.addEventListener('click', () => {
-                const checkedBoxes = document.querySelectorAll('.image-checkbox.checked');
-                if (checkedBoxes.length === 0) return;
-                
-                if (confirm(`Êtes-vous sûr de vouloir supprimer ${checkedBoxes.length} image(s) ?`)) {
-                    let deletedCount = 0;
-                    
-                    // Collecter tous les IDs d'abord pour éviter les problèmes lors de la suppression
-                    const imageIds = Array.from(checkedBoxes).map(checkbox => 
-                        checkbox.getAttribute('data-id')
-                    );
-                    
-                    // Supprimer chaque image
-                    imageIds.forEach(imageId => {
-                        if (deleteImage(imageId)) {
-                            deletedCount++;
-                        }
-                    });
-                    
-                    // Mettre à jour l'interface
-                    renderImageGallery();
-                    renderCategoryCards();
-                    
-                    alert(`${deletedCount} image(s) supprimée(s) avec succès!`);
-                }
-            });
-        }
-    }
-
-    // Configurer les modals
-    function setupModals() {
-        const imageDetailModal = document.getElementById('imageDetailModal');
-        const closeImageDetailModal = document.getElementById('closeImageDetailModal');
-        const cancelImageDetail = document.getElementById('cancelImageDetail');
-        const saveImageDetail = document.getElementById('saveImageDetail');
-        
-        if (closeImageDetailModal && imageDetailModal) {
-            closeImageDetailModal.addEventListener('click', () => {
-                imageDetailModal.classList.remove('active');
-            });
-        }
-        
-        if (cancelImageDetail && imageDetailModal) {
-            cancelImageDetail.addEventListener('click', () => {
-                imageDetailModal.classList.remove('active');
-            });
-        }
-        
-        if (saveImageDetail && imageDetailModal) {
-            saveImageDetail.addEventListener('click', handleImageFormSubmit);
-        }
-        
-        // Fermer les modals en cliquant à l'extérieur
-        window.addEventListener('click', (e) => {
-            if (imageDetailModal && e.target === imageDetailModal) {
-                imageDetailModal.classList.remove('active');
-            }
-        });
-    }
-
-    // Configurer la recherche
-    function setupSearch() {
-        const searchInput = document.querySelector('.search-bar input');
-        
-        if (searchInput) {
-            searchInput.addEventListener('input', function() {
-                const searchText = this.value.toLowerCase();
-                
-                // Obtenir tous les éléments de carte d'image
-                const imageCards = document.querySelectorAll('.image-card');
-                
-                // Si le champ est vide, afficher toutes les cartes
-                if (searchText === '') {
-                    imageCards.forEach(card => {
-                        card.style.display = '';
-                    });
-                    return;
-                }
-                
-                // Filtrer les cartes par texte de recherche
-                imageCards.forEach(card => {
-                    const titleElement = card.querySelector('.image-title');
-                    const metaElement = card.querySelector('.image-meta');
-                    
-                    if (!titleElement) return;
-                    
-                    const title = titleElement.textContent.toLowerCase();
-                    const meta = metaElement ? metaElement.textContent.toLowerCase() : '';
-                    
-                    if (title.includes(searchText) || meta.includes(searchText)) {
-                        card.style.display = '';
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
-            });
-        }
-    }
-
-    // Initialiser quand le DOM est chargé
-    document.addEventListener('DOMContentLoaded', initializeDynamicImageManagement);
-   
-   // ==============================================
-// SERVICE DE DONNÉES PARTAGÉES
+// Nouveau code à mettre dans la balise <script> à la fin de image-management.html
 // ==============================================
-// Ce script doit être inclus dans toutes les pages (index.html, admin-panel.html, image-management.html)
+// SERVICE DE DONNÉES POUR AUTOSENEGAL
+// ==============================================
 
 // Clés de stockage localStorage
 const STORAGE_KEYS = {
@@ -1755,7 +857,14 @@ const STORAGE_KEYS = {
     SETTINGS: 'autosenegal_settings'
 };
 
-// Service de gestion des données
+// Configuration Cloudinary 
+const cloudinaryConfig = {
+    cloudName: 'diovja6qr', // Remplacer par le vôtre
+    uploadPreset: 'ndiambour',   // À créer dans votre compte Cloudinary
+    folder: 'ndiambour'          // Dossier dans votre compte Cloudinary
+};
+
+// Service de gestion des données unifié
 const DataService = {
     // Initialiser les données si elles n'existent pas
     init: function() {
@@ -1783,7 +892,7 @@ const DataService = {
         // Paramètres
         if (!localStorage.getItem(STORAGE_KEYS.SETTINGS)) {
             localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify({
-                siteName: 'AutoSénégal',
+                siteName: 'Ndiambour Location',
                 currency: 'FCFA',
                 language: 'fr'
             }));
@@ -1817,27 +926,78 @@ const DataService = {
         return images.find(img => img.id === imageId);
     },
     
-    // Ajouter une image
-    addImage: function(imageData) {
-        const images = this.getAllImages();
-        
-        // Générer un ID si non fourni
-        if (!imageData.id) {
-            imageData.id = 'img-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+    // Ajouter une image (adaptée pour Cloudinary)
+    addImage: function(file, metadata = {}) {
+        try {
+            const images = this.getAllImages();
+            
+            // Générer un ID unique
+            const imageId = metadata.id || 'img-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+            
+            // Créer l'objet image
+            const imageData = {
+                id: imageId,
+                fileName: metadata.fileName || file.name,
+                fileType: metadata.fileType || (file.type ? file.type.split('/')[1].toUpperCase() : 'UNKNOWN'),
+                category: metadata.category || 'others',
+                alt: metadata.alt || file.name,
+                src: metadata.src || '', // URL Cloudinary
+                size: metadata.size || this.formatFileSize(file.size),
+                dimensions: metadata.dimensions || 'Unknown',
+                vehicleId: metadata.vehicleId || null,
+                vehicleName: metadata.vehicleName || '',
+                dateAdded: new Date().toISOString(),
+                // Ajouter des informations spécifiques à Cloudinary
+                isCloudinary: metadata.src && metadata.src.includes('cloudinary.com'),
+                publicId: metadata.publicId || this.extractPublicIdFromUrl(metadata.src)
+            };
+            
+            // Ajouter l'image à la collection
+            images.push(imageData);
+            localStorage.setItem(STORAGE_KEYS.IMAGES, JSON.stringify(images));
+            
+            // Mettre à jour le compteur de catégorie
+            this.updateCategoryCount(imageData.category, 1);
+            
+            // Si l'image est associée à un véhicule, mettre à jour le véhicule
+            if (imageData.vehicleId) {
+                this.addImageToVehicle(imageId, imageData.vehicleId);
+            }
+            
+            return imageData;
+        } catch (error) {
+            console.error("Erreur lors de l'ajout de l'image:", error);
+            return null;
         }
+    },
+    
+    // Extraire le publicId d'une URL Cloudinary
+    extractPublicIdFromUrl: function(url) {
+        if (!url || !url.includes('cloudinary.com')) return null;
         
-        // Ajouter date si non fournie
-        if (!imageData.dateAdded) {
-            imageData.dateAdded = new Date().toISOString();
+        try {
+            // Format typique: https://res.cloudinary.com/cloudName/image/upload/v1234567890/folder/publicId.ext
+            const uploadIndex = url.indexOf('/upload/');
+            if (uploadIndex === -1) return null;
+            
+            // Récupérer la partie après /upload/
+            const pathPart = url.substring(uploadIndex + 8);
+            
+            // Supprimer la version si présente (v1234567890/)
+            const versionMatch = pathPart.match(/^v\d+\//);
+            const pathWithoutVersion = versionMatch ? pathPart.substring(versionMatch[0].length) : pathPart;
+            
+            // Récupérer le publicId (sans l'extension)
+            const extensionIndex = pathWithoutVersion.lastIndexOf('.');
+            const publicId = extensionIndex !== -1 
+                ? pathWithoutVersion.substring(0, extensionIndex) 
+                : pathWithoutVersion;
+            
+            return publicId;
+        } catch (error) {
+            console.error("Erreur lors de l'extraction du publicId:", error);
+            return null;
         }
-        
-        images.push(imageData);
-        localStorage.setItem(STORAGE_KEYS.IMAGES, JSON.stringify(images));
-        
-        // Mettre à jour le compteur de catégorie
-        this.updateCategoryCount(imageData.category, 1);
-        
-        return imageData;
     },
     
     // Mettre à jour une image
@@ -1928,67 +1088,6 @@ const DataService = {
         return vehicles.find(v => v.id === vehicleId);
     },
     
-    // Ajouter un véhicule
-    addVehicle: function(vehicleData) {
-        const vehicles = this.getAllVehicles();
-        
-        // Générer un ID si non fourni
-        if (!vehicleData.id) {
-            vehicleData.id = 'vehicle-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
-        }
-        
-        // Initialiser le tableau d'images si non fourni
-        if (!vehicleData.images) {
-            vehicleData.images = [];
-        }
-        
-        // Ajouter date si non fournie
-        if (!vehicleData.dateAdded) {
-            vehicleData.dateAdded = new Date().toISOString();
-        }
-        
-        vehicles.push(vehicleData);
-        localStorage.setItem(STORAGE_KEYS.VEHICLES, JSON.stringify(vehicles));
-        
-        return vehicleData;
-    },
-    
-    // Mettre à jour un véhicule
-    updateVehicle: function(vehicleId, updates) {
-        const vehicles = this.getAllVehicles();
-        const index = vehicles.findIndex(v => v.id === vehicleId);
-        
-        if (index === -1) return null;
-        
-        const updatedVehicle = {...vehicles[index], ...updates};
-        vehicles[index] = updatedVehicle;
-        
-        localStorage.setItem(STORAGE_KEYS.VEHICLES, JSON.stringify(vehicles));
-        return updatedVehicle;
-    },
-    
-    // Supprimer un véhicule
-    deleteVehicle: function(vehicleId) {
-        const vehicles = this.getAllVehicles();
-        const index = vehicles.findIndex(v => v.id === vehicleId);
-        
-        if (index === -1) return false;
-        
-        // Récupérer les images associées pour mettre à jour leurs associations
-        const vehicleImages = this.getImagesByVehicle(vehicleId);
-        
-        // Supprimer le véhicule
-        vehicles.splice(index, 1);
-        localStorage.setItem(STORAGE_KEYS.VEHICLES, JSON.stringify(vehicles));
-        
-        // Mettre à jour les images associées
-        vehicleImages.forEach(img => {
-            this.updateImage(img.id, {vehicleId: null, vehicleName: ''});
-        });
-        
-        return true;
-    },
-    
     // Ajouter une image à un véhicule
     addImageToVehicle: function(imageId, vehicleId) {
         const vehicles = this.getAllVehicles();
@@ -2048,20 +1147,503 @@ const DataService = {
         const i = Math.floor(Math.log(bytes) / Math.log(k));
         
         return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
-    },
-    
-    // Vider toutes les données (pour tests)
-    clearAllData: function() {
-        localStorage.removeItem(STORAGE_KEYS.IMAGES);
-        localStorage.removeItem(STORAGE_KEYS.VEHICLES);
-        localStorage.removeItem(STORAGE_KEYS.CATEGORIES);
-        this.init();
     }
 };
 
-// Initialiser le service de données au chargement
+// ==============================================
+// FONCTIONS DE L'INTERFACE UTILISATEUR
+// ==============================================
+
+// Configuration du widget d'upload Cloudinary
+function setupCloudinaryUpload() {
+    const uploadBtn = document.getElementById('cloudinaryUploadBtn');
+    if (!uploadBtn) {
+        console.error("Bouton d'upload Cloudinary non trouvé");
+        return;
+    }
+    
+    console.log("Configuration du bouton d'upload Cloudinary");
+    
+    uploadBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        console.log("Bouton d'upload Cloudinary cliqué");
+        
+        // Vérifier si Cloudinary est disponible
+        if (typeof cloudinary === 'undefined') {
+            console.error("L'API Cloudinary n'est pas disponible");
+            alert("Service d'upload non disponible. Veuillez actualiser la page et réessayer.");
+            return;
+        }
+        
+        // Obtenir la catégorie sélectionnée
+        const categorySelect = document.getElementById('uploadCategory');
+        const selectedCategory = categorySelect ? categorySelect.value : 'others';
+        
+        console.log("Catégorie sélectionnée:", selectedCategory);
+        
+        // Options d'upload
+        const uploadOptions = {
+            cloudName: cloudinaryConfig.cloudName,
+            uploadPreset: cloudinaryConfig.uploadPreset,
+            folder: cloudinaryConfig.folder,
+            multiple: true,
+            maxFiles: 10,
+            sources: ['local', 'url', 'camera'],
+            resourceType: 'image',
+            clientAllowedFormats: ['jpg', 'jpeg', 'png', 'webp'],
+            maxFileSize: 5000000, // 5MB
+            tags: [selectedCategory],
+            context: { category: selectedCategory },
+            styles: {
+                palette: {
+                    window: "#FFFFFF",
+                    sourceBg: "#F0F2F5",
+                    windowBorder: "#90A0B3",
+                    tabIcon: "#1565C0",
+                    inactiveTabIcon: "#69778A",
+                    menuIcons: "#1565C0",
+                    link: "#0078FF",
+                    action: "#1565C0",
+                    inProgress: "#0078FF",
+                    complete: "#20B832",
+                    error: "#FF3030",
+                    textDark: "#000000",
+                    textLight: "#FFFFFF"
+                }
+            },
+            language: 'fr',
+            text: {
+                'fr': {
+                    'local': {
+                        'browse': 'Parcourir',
+                        'dd_title_single': 'Glissez-déposez une image',
+                        'dd_title_multi': 'Glissez-déposez des images',
+                        'drop_title_single': 'Déposez une image',
+                        'drop_title_multiple': 'Déposez des images'
+                    }
+                }
+            }
+        };
+        
+        // Ouvrir le widget directement (sans passer par CloudinaryService)
+        cloudinary.openUploadWidget(uploadOptions, function(error, result) {
+            console.log("Callback Cloudinary invoqué", error, result);
+            
+            if (error) {
+                console.error("Erreur Cloudinary:", error);
+                // Ne pas afficher d'alerte pour les annulations de l'utilisateur
+                if (error.message !== "User closed widget") {
+                    alert("Une erreur est survenue lors de l'upload. Veuillez réessayer.");
+                }
+                return;
+            }
+            
+            // Vérifier si l'événement est un succès d'upload
+            if (result && result.event === "success") {
+                // Une image a été téléchargée avec succès
+                const imageInfo = result.info;
+                console.log("Upload réussi:", imageInfo);
+                
+                // Créer un objet de métadonnées pour l'image
+                const metadata = {
+                    src: imageInfo.secure_url,
+                    fileName: imageInfo.original_filename,
+                    fileType: imageInfo.format.toUpperCase(),
+                    size: DataService.formatFileSize(imageInfo.bytes),
+                    dimensions: `${imageInfo.width} × ${imageInfo.height}`,
+                    category: selectedCategory,
+                    alt: imageInfo.original_filename,
+                    publicId: imageInfo.public_id
+                };
+                
+                // Créer un faux objet File pour la compatibilité
+                const fakeFile = {
+                    name: imageInfo.original_filename,
+                    type: `image/${imageInfo.format}`,
+                    size: imageInfo.bytes
+                };
+                
+                // Ajouter l'image à DataService
+                const addedImage = DataService.addImage(fakeFile, metadata);
+                console.log('Image ajoutée à la base de données:', addedImage);
+                
+                // Mettre à jour l'affichage
+                renderImageGallery();
+                
+                // Notification
+                alert('Image téléchargée avec succès !');
+            }
+        });
+    });
+    
+    console.log("Bouton d'upload Cloudinary configuré avec succès");
+}
+
+// Configuration de la galerie d'images
+function setupImageGallery() {
+    // Configurer les onglets de catégorie
+    const tabs = document.querySelectorAll('.tab');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            // Retirer la classe active de tous les onglets
+            tabs.forEach(t => t.classList.remove('active'));
+            
+            // Ajouter la classe active à l'onglet cliqué
+            this.classList.add('active');
+            
+            // Filtrer les images par catégorie
+            const category = this.getAttribute('data-tab');
+            renderImageGallery(category);
+        });
+    });
+    
+    // Afficher initialement toutes les images
+    renderImageGallery();
+}
+
+// Rendu de la galerie d'images
+function renderImageGallery(category = 'all') {
+    const imageGallery = document.querySelector('.image-gallery');
+    if (!imageGallery) return;
+    
+    // Vider la galerie
+    imageGallery.innerHTML = '';
+    
+    // Obtenir les images à afficher
+    const images = DataService.getImagesByCategory(category);
+    
+    if (images.length === 0) {
+        // Afficher un message si aucune image n'est disponible
+        imageGallery.innerHTML = `
+            <div class="empty-gallery">
+                <i class="fas fa-images" style="font-size: 3rem; color: #ccc; margin-bottom: 15px;"></i>
+                <p>Aucune image disponible dans cette catégorie.</p>
+                <p>Utilisez le bouton "Parcourir les fichiers" pour ajouter des images.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // Générer une carte pour chaque image
+    images.forEach(image => {
+        const imageCard = createImageCard(image);
+        imageGallery.appendChild(imageCard);
+    });
+    
+    // Mettre à jour le compteur d'images sélectionnées
+    updateSelectedCount();
+}
+
+// Créer une carte d'image
+function createImageCard(image) {
+    // Créer l'élément div pour la carte
+    const card = document.createElement('div');
+    card.className = 'image-card';
+    card.setAttribute('data-category', image.category);
+    card.setAttribute('data-id', image.id);
+    
+    // Définir le contenu HTML de la carte
+    card.innerHTML = `
+        <img src="${image.src}" alt="${image.alt}" class="image-thumbnail" 
+             onerror="this.src='https://via.placeholder.com/150x100?text=Image+non+disponible'">
+        <div class="image-checkbox" data-id="${image.id}"></div>
+        <div class="image-actions">
+            <button class="image-action" title="Voir" data-image-id="${image.id}"><i class="fas fa-eye"></i></button>
+            <button class="image-action" title="Éditer" data-image-id="${image.id}"><i class="fas fa-edit"></i></button>
+            <button class="image-action" title="Supprimer" data-image-id="${image.id}"><i class="fas fa-trash-alt"></i></button>
+        </div>
+        <div class="image-info">
+            <h3 class="image-title">${image.fileName}</h3>
+            <div class="image-meta">
+                <span>${image.fileType} • ${image.size}</span>
+                <span>${image.dimensions}</span>
+            </div>
+        </div>
+    `;
+    
+    // Configurer les événements pour les boutons d'action
+    setupImageCardEvents(card);
+    
+    return card;
+}
+
+// Configuration des événements pour une carte d'image
+function setupImageCardEvents(cardElement) {
+    // Checkbox pour sélection
+    const checkbox = cardElement.querySelector('.image-checkbox');
+    if (checkbox) {
+        checkbox.addEventListener('click', function() {
+            this.classList.toggle('checked');
+            updateSelectedCount();
+        });
+    }
+    
+    // Boutons d'action
+    const actionButtons = cardElement.querySelectorAll('.image-action');
+    actionButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const action = this.getAttribute('title');
+            const imageId = this.getAttribute('data-image-id');
+            
+            switch(action) {
+                case 'Voir':
+                    openImageDetailModal(imageId);
+                    break;
+                case 'Éditer':
+                    openImageEditModal(imageId);
+                    break;
+                case 'Supprimer':
+                    confirmImageDeletion(imageId, this);
+                    break;
+            }
+        });
+    });
+}
+
+// Mettre à jour le compteur d'images sélectionnées
+function updateSelectedCount() {
+    const checkedBoxes = document.querySelectorAll('.image-checkbox.checked');
+    const countElement = document.querySelector('.selected-count');
+    const batchButtons = document.querySelectorAll('.batch-buttons button');
+    
+    if (countElement) {
+        const count = checkedBoxes.length;
+        countElement.textContent = `${count} image${count !== 1 ? 's' : ''} sélectionnée${count !== 1 ? 's' : ''}`;
+    }
+    
+    // Activer/désactiver les boutons d'action par lot
+    batchButtons.forEach(button => {
+        button.disabled = checkedBoxes.length === 0;
+    });
+}
+
+// Ouvrir le modal de détails d'image
+function openImageDetailModal(imageId) {
+    const modal = document.getElementById('imageDetailModal');
+    if (!modal) return;
+    
+    const image = DataService.getImageById(imageId);
+    if (!image) return;
+    
+    // Mettre à jour le contenu du modal
+    const previewImg = document.getElementById('previewImg');
+    const fileName = document.getElementById('fileName');
+    const fileType = document.getElementById('fileType');
+    const fileSize = document.getElementById('fileSize');
+    const fileDimensions = document.getElementById('fileDimensions');
+    const fileDate = document.getElementById('fileDate');
+    const altText = document.getElementById('altText');
+    const imageCategory = document.getElementById('imageCategory');
+    
+    if (previewImg) previewImg.src = image.src;
+    if (fileName) fileName.textContent = image.fileName;
+    if (fileType) fileType.textContent = image.fileType;
+    if (fileSize) fileSize.textContent = image.size;
+    if (fileDimensions) fileDimensions.textContent = image.dimensions;
+    if (fileDate) {
+        // Formatage de la date
+        const date = new Date(image.dateAdded);
+        fileDate.textContent = date.toLocaleDateString('fr-FR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }
+    if (altText) altText.value = image.alt;
+    if (imageCategory) {
+        const options = imageCategory.querySelectorAll('option');
+        options.forEach(option => {
+            option.selected = option.value === image.category;
+        });
+    }
+    
+    // Ajouter l'ID de l'image au modal pour le récupérer lors de la sauvegarde
+    modal.setAttribute('data-image-id', image.id);
+    
+    // Afficher le modal
+    modal.classList.add('active');
+}
+
+// Ouvrir le modal d'édition d'image
+function openImageEditModal(imageId) {
+    // Utiliser le même modal que pour les détails
+    openImageDetailModal(imageId);
+}
+
+// Confirmer la suppression d'une image
+function confirmImageDeletion(imageId, buttonElement) {
+    const image = DataService.getImageById(imageId);
+    if (!image) return;
+    
+    if (confirm(`Êtes-vous sûr de vouloir supprimer l'image "${image.fileName}" ?`)) {
+        // Supprimer l'image de la base de données
+        const success = DataService.deleteImage(imageId);
+        
+        if (success) {
+            // Supprimer la carte de l'image de l'interface
+            const imageCard = buttonElement.closest('.image-card');
+            if (imageCard) {
+                imageCard.remove();
+            }
+            
+            // Mettre à jour le compteur
+            updateSelectedCount();
+            
+            alert(`Image "${image.fileName}" supprimée avec succès!`);
+        } else {
+            alert("Erreur lors de la suppression de l'image.");
+        }
+    }
+}
+
+// Configuration des modals
+function setupModals() {
+    const imageDetailModal = document.getElementById('imageDetailModal');
+    const closeImageDetailModal = document.getElementById('closeImageDetailModal');
+    const cancelImageDetail = document.getElementById('cancelImageDetail');
+    const saveImageDetail = document.getElementById('saveImageDetail');
+    
+    if (closeImageDetailModal && imageDetailModal) {
+        closeImageDetailModal.addEventListener('click', () => {
+            imageDetailModal.classList.remove('active');
+        });
+    }
+    
+    if (cancelImageDetail && imageDetailModal) {
+        cancelImageDetail.addEventListener('click', () => {
+            imageDetailModal.classList.remove('active');
+        });
+    }
+    
+    if (saveImageDetail && imageDetailModal) {
+        saveImageDetail.addEventListener('click', (event) => {
+            event.preventDefault();
+            
+            const imageId = imageDetailModal.getAttribute('data-image-id');
+            if (!imageId) return;
+            
+            // Récupérer les nouvelles valeurs
+            const altText = document.getElementById('altText')?.value;
+            const imageCategory = document.getElementById('imageCategory')?.value;
+            
+            // Mettre à jour l'image
+            const updatedImage = DataService.updateImage(imageId, {
+                alt: altText,
+                category: imageCategory
+            });
+            
+            if (updatedImage) {
+                // Mettre à jour l'interface
+                renderImageGallery();
+                
+                // Fermer le modal
+                imageDetailModal.classList.remove('active');
+                
+                alert('Modifications enregistrées avec succès!');
+            } else {
+                alert("Erreur lors de la mise à jour de l'image.");
+            }
+        });
+    }
+    
+    // Fermer les modals en cliquant à l'extérieur
+    window.addEventListener('click', (e) => {
+        if (imageDetailModal && e.target === imageDetailModal) {
+            imageDetailModal.classList.remove('active');
+        }
+    });
+}
+
+// Configuration de la recherche
+function setupSearch() {
+    const searchInput = document.querySelector('.search-bar input');
+    
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const searchText = this.value.toLowerCase();
+            
+            const imageCards = document.querySelectorAll('.image-card');
+            
+            imageCards.forEach(card => {
+                if (searchText === '') {
+                    card.style.display = '';
+                    return;
+                }
+                
+                const titleElement = card.querySelector('.image-title');
+                const metaElement = card.querySelector('.image-meta');
+                
+                if (!titleElement) return;
+                
+                const title = titleElement.textContent.toLowerCase();
+                const meta = metaElement ? metaElement.textContent.toLowerCase() : '';
+                
+                if (title.includes(searchText) || meta.includes(searchText)) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    }
+}
+
+// Initialiser quand le DOM est chargé
 document.addEventListener('DOMContentLoaded', function() {
-    DataService.init();
-});</script>
+    console.log("DOM chargé, initialisation...");
+  
+    // Vérification du chargement des scripts Cloudinary
+    if (typeof cloudinary === 'undefined') {
+        console.log("Cloudinary n'est pas chargé, tentative de chargement...");
+        
+        // Charge le widget d'upload Cloudinary s'il n'est pas déjà chargé
+        const cloudinaryWidgetScript = document.createElement('script');
+        cloudinaryWidgetScript.src = 'https://upload-widget.cloudinary.com/global/all.js';
+        cloudinaryWidgetScript.type = 'text/javascript';
+        cloudinaryWidgetScript.onload = function() {
+            console.log("Script Cloudinary widget chargé avec succès");
+            
+            // Charge le script core de Cloudinary
+            const cloudinaryCoreScript = document.createElement('script');
+            cloudinaryCoreScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/cloudinary-core/2.11.4/cloudinary-core-shrinkwrap.min.js';
+            cloudinaryCoreScript.type = 'text/javascript';
+            cloudinaryCoreScript.onload = function() {
+                console.log("Script Cloudinary core chargé avec succès");
+                
+                // Initialiser l'application une fois les scripts chargés
+                initApp();
+            };
+            document.head.appendChild(cloudinaryCoreScript);
+        };
+        document.head.appendChild(cloudinaryWidgetScript);
+    } else {
+        console.log("Cloudinary déjà chargé");
+        initApp();
+    }
+    
+    // Fonction d'initialisation de l'application
+    function initApp() {
+        // Initialiser les données
+        DataService.init();
+        
+        // Configurer l'interface utilisateur
+        setupCloudinaryUpload();
+        setupImageGallery();
+        setupModals();
+        setupSearch();
+        
+        // Charger les images au démarrage
+        renderImageGallery();
+        
+        console.log("Application initialisée avec succès");
+    }
+});
+
+</script>
 </body>
 </html>

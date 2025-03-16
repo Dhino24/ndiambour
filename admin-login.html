@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion Administration - Ndiambour Location</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Variables et réinitialisation */
+        :root {
+            --primary-color: #1565C0; /* Bleu Ndiambour */
+            --primary-dark: #0D47A1;
+            --primary-light: #42A5F5;
+            --secondary-color: #FF9800; /* Orange */
+            --light: #F5F5F5;
+            --dark: #333333;
+            --gray: #F0F2F5;
+            --shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #eef2f7 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-container {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, var(--primary-color), var(--primary-light));
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .logo img {
+            height: 60px;
+            margin-right: 10px;
+        }
+
+        .logo-text {
+            font-family: 'Arial Black', 'Helvetica Bold', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 900;
+            color: var(--primary-color);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            line-height: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-text .top-text {
+            font-size: 1.4em;
+            color: var(--primary-color);
+        }
+
+        .logo-text .bottom-text {
+            font-size: 0.9em;
+            margin-top: 2px;
+            letter-spacing: 0.5px;
+            color: var(--primary-color);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-header h2 {
+            font-size: 1.8rem;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+
+        .login-header p {
+            color: #777;
+            font-size: 0.9rem;
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 15px 12px 40px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.1);
+            outline: none;
+        }
+
+        .form-icon {
+            position: absolute;
+            left: 15px;
+            top: 39px;
+            color: #aaa;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 39px;
+            color: #aaa;
+            cursor: pointer;
+        }
+
+        .form-checkbox {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .form-checkbox input {
+            margin-right: 10px;
+        }
+
+        .form-checkbox label {
+            font-size: 0.9rem;
+        }
+
+        .login-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-btn:hover {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #083378 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(13, 71, 161, 0.3);
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
+        }
+
+        .login-btn::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: -100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: all 0.6s ease;
+        }
+
+        .login-btn:hover::after {
+            left: 100%;
+        }
+
+        .site-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .site-link a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        .site-link a:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+
+        .error-message {
+            background-color: #ffebee;
+            color: #c62828;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: opacity 0.3s ease, max-height 0.3s ease, margin 0.3s ease, padding 0.3s ease;
+        }
+
+        .error-message.active {
+            opacity: 1;
+            max-height: 60px;
+            margin-bottom: 20px;
+            padding: 12px;
+        }
+
+        .error-message i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            50% { transform: translateX(10px); }
+            75% { transform: translateX(-10px); }
+        }
+
+        .shake {
+            animation: shake 0.5s;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <img src="favicon.svg" alt="Ndiambour Location" onerror="this.src='/api/placeholder/60/60'">
+            <div class="logo-text">
+                <span class="top-text">NDIAMBOUR</span>
+                <span class="bottom-text">LOCATION</span>
+            </div>
+        </div>
+        
+        <div class="login-header">
+            <h2>Connexion Admin</h2>
+            <p>Entrez vos identifiants pour accéder au panneau d'administration</p>
+        </div>
+        
+        <div class="error-message" id="error-message">
+            <i class="fas fa-exclamation-circle"></i>
+            <span id="error-text">Email ou mot de passe incorrect</span>
+        </div>
+        
+        <form class="login-form" id="login-form">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <i class="fas fa-envelope form-icon"></i>
+                <input type="email" id="email" name="email" class="form-input" placeholder="Votre email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Mot de passe</label>
+                <i class="fas fa-lock form-icon"></i>
+                <input type="password" id="password" name="password" class="form-input" placeholder="Votre mot de passe" required>
+                <i class="fas fa-eye password-toggle" id="password-toggle"></i>
+            </div>
+            
+            <div class="form-checkbox">
+                <input type="checkbox" id="remember" name="remember">
+                <label for="remember">Se souvenir de moi</label>
+            </div>
+            
+            <button type="submit" class="login-btn" id="login-btn">
+                <span>Connexion</span>
+            </button>
+        </form>
+        
+        <div class="site-link">
+            <a href="index.html"><i class="fas fa-arrow-left"></i> Retour au site</a>
+        </div>
+    </div>
+
+    <!-- Scripts Firebase -->
+    <script type="module">
+        // Import Firebase
+        import { auth, signInWithEmailAndPassword } from './firebase-config.js';
+
+        // Éléments du DOM
+        const loginForm = document.getElementById('login-form');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const passwordToggle = document.getElementById('password-toggle');
+        const errorMessage = document.getElementById('error-message');
+        const errorText = document.getElementById('error-text');
+        const loginBtn = document.getElementById('login-btn');
+
+        // Basculer la visibilité du mot de passe
+        passwordToggle.addEventListener('click', function() {
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                this.classList.remove('fa-eye');
+                this.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                this.classList.remove('fa-eye-slash');
+                this.classList.add('fa-eye');
+            }
+        });
+
+        // Gestion de la soumission du formulaire
+        loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
+            
+            // Désactiver le bouton pendant la connexion
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connexion...';
+            
+            try {
+                // Connexion à Firebase
+                await signInWithEmailAndPassword(auth, email, password);
+                
+                // Redirection vers le panneau d'administration
+                window.location.href = 'admin-panel.html';
+            } catch (error) {
+                // Afficher le message d'erreur
+                let message = 'Email ou mot de passe incorrect';
+                
+                if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+                    message = 'Email ou mot de passe incorrect';
+                } else if (error.code === 'auth/too-many-requests') {
+                    message = 'Trop de tentatives. Veuillez réessayer plus tard.';
+                } else if (error.code === 'auth/network-request-failed') {
+                    message = 'Problème de connexion. Vérifiez votre réseau.';
+                } else {
+                    message = 'Erreur de connexion: ' + error.message;
+                }
+                
+                errorText.textContent = message;
+                errorMessage.classList.add('active');
+                loginForm.classList.add('shake');
+                
+                // Réinitialiser l'animation de secousse
+                setTimeout(() => {
+                    loginForm.classList.remove('shake');
+                }, 500);
+                
+                // Réactiver le bouton
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = '<span>Connexion</span>';
+            }
+        });
+
+        // Vérifier si l'utilisateur est déjà connecté
+        auth.onAuthStateChanged(function(user) {
+            if (user) {
+                window.location.href = 'admin-panel.html';
+            }
+        });
+    </script>
+</body>
+</html>

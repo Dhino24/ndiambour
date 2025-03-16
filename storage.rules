@@ -1,0 +1,11 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /images/{imageId} {
+      // Tout le monde peut voir les images
+      allow read: if true;
+      // Seuls les administrateurs peuvent uploader
+      allow write: if request.auth != null;
+    }
+  }
+}
