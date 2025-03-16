@@ -1,0 +1,2365 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ndiambour Location - Location de Voitures au Sénégal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+   <style>
+  /* Variables et réinitialisation */
+:root {
+    --primary-color: #1565C0; /* Bleu, couleur dominante du logo Ndiambour */
+    --primary-dark: #0D47A1; /* Bleu foncé pour contrastes */
+    --primary-light: #42A5F5; /* Bleu clair pour dégradés */
+    --secondary-color: #FF9800; /* Orange pour accents */
+    --secondary-dark: #F57C00; /* Orange foncé */
+    --accent-color: #FF6F00; /* Orange vif pour mise en valeur */
+    --light: #F5F5F5;
+    --dark: #333333;
+    --gray: #F0F2F5;
+    --shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s ease;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    overflow-x: hidden;
+    color: var(--dark);
+    background: linear-gradient(135deg, #f5f7fa 0%, #eef2f7 100%);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+@keyframes fadeInScale {
+    0% { opacity: 0; transform: scale(0.92); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes shine {
+    0% { transform: translateX(-100%) rotate(25deg); }
+    100% { transform: translateX(100%) rotate(25deg); }
+}
+
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-5px); }
+    100% { transform: translateY(0px); }
+}
+
+/* Styles généraux */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.btn {
+    display: inline-block;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #1976D2 0%, #1565C0 100%);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: 0 4px 10px rgba(21, 101, 192, 0.3);
+}
+
+.btn:hover {
+    transform: translateY(-3px);
+    background: linear-gradient(135deg, #1565C0 0%, #0D47A1 100%);
+    box-shadow: 0 6px 15px rgba(21, 101, 192, 0.5);
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #FF9800 0%, #FF6F00 100%);
+    color: white;
+    box-shadow: 0 4px 10px rgba(255, 111, 0, 0.3);
+}
+
+.btn-secondary:hover {
+    background: linear-gradient(135deg, #FF6F00 0%, #E65100 100%);
+    box-shadow: 0 6px 15px rgba(255, 111, 0, 0.5);
+}
+
+.btn-outline {
+    background: transparent;
+    border: 2px solid var(--primary-color);
+    color: var(--primary-color);
+    box-shadow: none;
+}
+
+.btn-outline:hover {
+    background: rgba(21, 101, 192, 0.1);
+    border-color: #1976D2;
+}
+
+.section {
+    padding: 80px 0;
+}
+
+.section-title {
+    text-align: center;
+    margin-bottom: 50px;
+    font-size: 2.5rem;
+    font-weight: 700;
+    background: linear-gradient(to right, #1565C0, #42A5F5);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    display: inline-block;
+}
+
+.section-subtitle {
+    text-align: center;
+    color: var(--primary-dark);
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+}
+
+.card {
+    background-color: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+    border-top: 3px solid transparent;
+}
+
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+    border-top: 3px solid var(--primary-color);
+}
+
+/* Header styles */
+.header {
+    background: linear-gradient(to right, rgba(255,255,255,0.95) 0%, rgba(240,244,248,0.95) 100%);
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+}
+
+/* Style personnalisé pour le texte du logo */
+.logo {
+    display: flex;
+    align-items: center;
+}
+
+.logo img {
+    height: 50px;
+    margin-right: 10px;
+}
+
+.logo-text {
+    font-family: 'Arial Black', 'Helvetica Bold', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 900;
+    color: var(--primary-color);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    line-height: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.logo-text .top-text {
+    font-size: 1.4em;
+    color: var(--primary-color);
+}
+
+.logo-text .bottom-text {
+    font-size: 0.9em;
+    margin-top: 2px;
+    letter-spacing: 0.5px;
+    color: var(--primary-color);
+}
+
+.menu {
+    display: flex;
+    list-style: none;
+}
+
+.menu-item {
+    margin-left: 30px;
+}
+
+.menu-link {
+    text-decoration: none;
+    color: var(--dark);
+    font-weight: 500;
+    transition: var(--transition);
+    position: relative;
+}
+
+.menu-link:hover {
+    color: var(--primary-color);
+}
+
+.menu-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -5px;
+    left: 0;
+    background-color: var(--primary-color);
+    transition: var(--transition);
+}
+
+.menu-link:hover::after {
+    width: 100%;
+}
+
+.menu-button {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--dark);
+}
+
+/* Country selector */
+.country-selector {
+    position: relative;
+    display: inline-block;
+}
+
+.current-country {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.current-country img {
+    width: 20px;
+    margin-right: 8px;
+}
+
+.countries-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: white;
+    box-shadow: var(--shadow);
+    border-radius: 10px;
+    min-width: 200px;
+    z-index: 100;
+    display: none;
+    padding: 10px 0;
+}
+
+.country-option {
+    display: flex;
+    align-items: center;
+    padding: 8px 15px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.country-option:hover {
+    background-color: #f5f5f5;
+}
+
+.country-option img {
+    width: 20px;
+    margin-right: 10px;
+}
+
+.country-selector:hover .countries-dropdown {
+    display: block;
+}
+
+/* Hero section */
+.hero {
+    background: linear-gradient(135deg, rgba(13, 71, 161, 0.8) 0%, rgba(21, 101, 192, 0.75) 100%), url('/api/placeholder/1200/600') center/cover no-repeat;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: white;
+    position: relative;
+    margin-top: 80px;
+}
+
+.hero-content {
+    animation: fadeIn 1s ease-out;
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    margin-bottom: 20px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+
+.hero-subtitle {
+    font-size: 1.5rem;
+    margin-bottom: 30px;
+    opacity: 0.9;
+}
+
+.hero-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+/* Sections */
+.services {
+    background-color: white;
+}
+
+.services-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+}
+
+.service-card {
+    padding: 30px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.service-icon, .feature-icon, .option-icon {
+    background: linear-gradient(135deg, #1565C0 0%, #42A5F5 100%);
+    color: white;
+    border-radius: 50%;
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 2rem;
+}
+
+.service-icon {
+    margin: 0 0 20px;
+}
+
+.service-title {
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+}
+
+.service-description {
+    margin-bottom: 20px;
+    line-height: 1.6;
+    flex-grow: 1;
+}
+
+/* Vehicles section */
+.vehicles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+.vehicle-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.vehicle-image {
+    height: 200px;
+    width: 100%;
+    object-fit: cover;
+    position: relative;
+    transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    animation: fadeInScale 0.8s ease forwards;
+    border-radius: 10px 10px 0 0;
+    overflow: hidden;
+}
+
+.vehicle-card:hover .vehicle-image {
+    transform: scale(1.08) translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+}
+
+.vehicle-image::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 30%;
+    height: 100%;
+    background: linear-gradient(to right, 
+        rgba(255, 255, 255, 0) 0%, 
+        rgba(255, 255, 255, 0.3) 50%, 
+        rgba(255, 255, 255, 0) 100%);
+    transform: translateX(-100%) rotate(25deg);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.vehicle-card:hover .vehicle-image::after {
+    animation: shine 1s ease-in-out;
+    opacity: 1;
+}
+
+.vehicle-content {
+    padding: 20px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.vehicle-title {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.vehicle-price {
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+}
+
+.vehicle-features {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.vehicle-feature {
+    display: flex;
+    align-items: center;
+}
+
+.vehicle-feature i {
+    color: var(--primary-color);
+    margin-right: 5px;
+}
+
+.vehicle-buttons {
+    margin-top: auto;
+    display: flex;
+    gap: 10px;
+}
+
+/* Why choose us */
+.why-choose-us {
+    background: linear-gradient(135deg, #F5F7FA 0%, #E4E8ED 100%);
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+}
+
+.feature-card {
+    text-align: center;
+    padding: 30px;
+}
+
+.feature-title {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+}
+
+.feature-description {
+    line-height: 1.6;
+}
+
+/* Options Section */
+.options-section {
+    background: linear-gradient(135deg, #EEF2F7 0%, #FFFFFF 100%);
+}
+
+.options-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+.option-card {
+    text-align: center;
+    padding: 30px;
+    border: 2px solid var(--gray);
+    border-radius: 15px;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.option-card:hover {
+    border-color: transparent;
+}
+
+.option-card:hover::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(135deg, #1976D2 0%, #42A5F5 100%);
+    z-index: -1;
+    border-radius: 15px;
+}
+
+.option-card:hover::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: white;
+    z-index: -1;
+    border-radius: 13px;
+}
+
+.option-title {
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    color: var(--primary-color);
+}
+
+.option-description {
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+/* Testimonials */
+.testimonials {
+    background-color: white;
+}
+
+.testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+.testimonial-card {
+    padding: 30px;
+    text-align: center;
+}
+
+.testimonial-text {
+    font-style: italic;
+    margin-bottom: 20px;
+    line-height: 1.6;
+    position: relative;
+}
+
+.testimonial-text::before,
+.testimonial-text::after {
+    content: '"';
+    font-size: 2rem;
+    color: var(--primary-color);
+    font-family: Georgia, serif;
+}
+
+.testimonial-author {
+    font-weight: 600;
+}
+
+.testimonial-role {
+    color: #777;
+    font-size: 0.9rem;
+}
+
+/* Call to action */
+.cta {
+    background: linear-gradient(135deg, rgba(13, 71, 161, 0.9) 0%, rgba(25, 118, 210, 0.8) 100%), 
+                url('/api/placeholder/1200/400') center/cover fixed no-repeat;
+    color: white;
+    text-align: center;
+}
+
+.cta-title {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+}
+
+.cta-description {
+    margin-bottom: 30px;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Footer */
+.footer {
+    background: linear-gradient(to right, #1A237E 0%, #0D47A1 100%);
+    color: white;
+    padding: 60px 0 20px;
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.footer-col h3 {
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.footer-col h3::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -8px;
+    width: 40px;
+    height: 3px;
+    background-color: var(--primary-light);
+}
+
+.footer-links {
+    list-style: none;
+}
+
+.footer-link {
+    margin-bottom: 10px;
+}
+
+.footer-link a {
+    color: #ccc;
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.footer-link a:hover {
+    color: white;
+}
+
+.social-links {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.social-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    color: white;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.social-link:hover {
+    background: var(--primary-color);
+    transform: translateY(-3px);
+}
+
+.social-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%);
+    transform: scale(0);
+    transition: transform 0.5s ease;
+}
+
+.social-link:hover::before {
+    transform: scale(2);
+}
+
+.copyright {
+    text-align: center;
+    padding-top: 30px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    font-size: 0.9rem;
+    color: #999;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-dark);
+}
+
+/* Admin panel preview */
+.admin-section {
+    background-color: var(--light);
+    padding: 50px 0;
+}
+
+.admin-preview {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: var(--shadow);
+}
+
+.admin-title {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    color: var(--primary-color);
+}
+
+.admin-features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.admin-feature {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+}
+
+.admin-feature i {
+    color: var(--primary-color);
+    font-size: 1.5rem;
+}
+
+.admin-feature-title {
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.admin-image {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    margin-top: 30px;
+}
+
+.admin-image img {
+    width: 100%;
+    height: auto;
+}
+
+/* Responsive styles */
+@media (max-width: 992px) {
+    .section-title {
+        font-size: 2rem;
+    }
+
+    .hero-title {
+        font-size: 2.5rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1.2rem;
+    }
+
+    .services-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        padding: 15px 0;
+    }
+
+    .menu {
+        position: fixed;
+        top: 80px;
+        left: -100%;
+        width: 80%;
+        height: calc(100vh - 80px);
+        background-color: white;
+        flex-direction: column;
+        align-items: center;
+        transition: var(--transition);
+        box-shadow: var(--shadow);
+    }
+
+    .menu.active {
+        left: 0;
+    }
+
+    .menu-item {
+        margin: 20px 0;
+    }
+
+    .menu-button {
+        display: block;
+    }
+
+    .hero-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .section {
+        padding: 60px 0;
+    }
+}
+
+@media (max-width: 576px) {
+    .hero-title {
+        font-size: 2rem;
+    }
+
+    .section-title {
+        font-size: 1.8rem;
+    }
+
+    .vehicles-grid,
+    .features-grid,
+    .testimonials-grid {
+        grid-template-columns: 1fr;
+    }
+}
+/* Styles pour les modals */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.modal.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background-color: white;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 1000px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    transform: translateY(-20px);
+    transition: all 0.3s ease;
+}
+
+.modal.active .modal-content {
+    transform: translateY(0);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.modal-title {
+    color: var(--primary-color);
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    cursor: pointer;
+    color: #777;
+    transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+    color: var(--primary-color);
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+/* Styles pour les détails du véhicule */
+.vehicle-details-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+.vehicle-gallery {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    position: relative;
+}
+
+.main-image {
+    width: 100%;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.4s ease;
+    animation: fadeInScale 0.6s ease forwards;
+}
+
+.main-image:hover {
+    transform: scale(1.02);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.gallery-thumbs {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+}
+
+.thumb-image {
+    width: 80px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    transform: scale(1);
+    filter: grayscale(30%);
+}
+
+.thumb-image:hover {
+    transform: scale(1.1);
+    filter: grayscale(0%);
+    z-index: 2;
+}
+
+.thumb-image.active, .thumb-image:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 3px 10px rgba(21, 101, 192, 0.3);
+    filter: grayscale(0%);
+}
+
+.thumb-image.active {
+    animation: float 2s infinite ease-in-out;
+}
+
+/* Ajoutez un indicateur de zoom sur l'image principale */
+.vehicle-gallery::before {
+    content: '\f00e';
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    width: 40px;
+    height: 40px;
+    background: rgba(21, 101, 192, 0.8);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.vehicle-gallery:hover::before {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.vehicle-info {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.vehicle-info h3 {
+    font-size: 1.8rem;
+    margin: 0;
+    color: var(--dark);
+}
+
+.vehicle-info .price {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.specs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 15px;
+    margin: 15px 0;
+}
+
+.spec-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 15px 10px;
+    background-color: var(--light);
+    border-radius: 10px;
+}
+
+.spec-item i {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    margin-bottom: 5px;
+}
+
+.spec-item span {
+    color: #777;
+    font-size: 0.9rem;
+    margin-bottom: 3px;
+}
+
+.spec-item strong {
+    color: var(--dark);
+}
+
+.description {
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    padding: 15px;
+    line-height: 1.6;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/* Styles pour le formulaire de réservation */
+.reservation-form, .contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.form-group label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--dark);
+}
+
+.form-group input, .form-group textarea, .form-group select {
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+}
+
+.form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.1);
+    outline: none;
+}
+
+.form-group textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.radio-group {
+    display: flex;
+    gap: 20px;
+    margin-top: 5px;
+}
+
+.radio-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.radio-option input[type="radio"] {
+    margin: 0;
+}
+
+.form-checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 10px 0;
+}
+
+.form-checkbox input {
+    margin-top: 4px;
+}
+
+.form-checkbox label {
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.form-actions {
+    margin-top: 10px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* Styles pour le formulaire de contact */
+.contact-grid {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 30px;
+}
+
+.contact-info {
+    background: linear-gradient(to bottom, #1976D2, #1565C0);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.contact-item {
+    display: flex;
+    gap: 15px;
+}
+
+.contact-item i {
+    font-size: 1.3rem;
+    margin-top: 3px;
+}
+
+.contact-item h4 {
+    margin: 0 0 5px;
+    font-size: 1.1rem;
+}
+
+.contact-item p {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .vehicle-details-container, .contact-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+    }
+}
+
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <!-- Header -->
+<header class="header">
+  <div class="container">
+      <nav class="navbar">
+          <div class="logo">
+              <!-- Logo en tant qu'image -->
+              <img src="favicon.svg" alt="Ndiambour Location" style="height: 55px; margin-right: 10px;">
+              <div class="logo-text">
+                  <span class="top-text">NDIAMBOUR</span>
+                  <span class="bottom-text">LOCATION</span>
+              </div>
+          </div>
+          <ul class="menu" id="menu">
+              <li class="menu-item"><a href="#" class="menu-link">Accueil</a></li>
+              <li class="menu-item"><a href="#vehicles" class="menu-link">Véhicules</a></li>
+              <li class="menu-item"><a href="#services" class="menu-link">Services</a></li>
+              <li class="menu-item"><a href="#about" class="menu-link">À propos</a></li>
+              <li class="menu-item"><a href="#contact" class="menu-link">Contact</a></li>
+              <li class="menu-item country-selector">
+                  <div class="current-country">
+                      <img src="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/flags/4x3/sn.svg" alt="Sénégal">
+                      <span>Sénégal</span>
+                  </div>
+                  <div class="countries-dropdown">
+                      <div class="country-option">
+                          <img src="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/flags/4x3/sn.svg" alt="Sénégal">
+                          <span>Sénégal</span>
+                      </div>
+                      <div class="country-option">
+                          <img src="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/flags/4x3/fr.svg" alt="France">
+                          <span>France</span>
+                      </div>
+                      <div class="country-option">
+                          <img src="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/flags/4x3/us.svg" alt="États-Unis">
+                          <span>États-Unis</span>
+                      </div>
+                      <div class="country-option">
+                          <img src="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/flags/4x3/ca.svg" alt="Canada">
+                          <span>Canada</span>
+                      </div>
+                      <div class="country-option">
+                          <img src="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/flags/4x3/be.svg" alt="Belgique">
+                          <span>Belgique</span>
+                      </div>
+                  </div>
+              </li>
+          </ul>
+          <button class="menu-button" id="menu-button">
+              <i class="fas fa-bars"></i>
+          </button>
+      </nav>
+  </div>
+</header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title">Trouvez le véhicule parfait au Sénégal</h1>
+                <p class="hero-subtitle">Vente et location de voitures de qualité aux meilleurs prix</p>
+                <div class="hero-buttons">
+                    <a href="#vehicles" class="btn">Acheter une voiture</a>
+                    <a href="#rent" class="btn btn-secondary">Louer une voiture</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="section services" id="services">
+        <div class="container">
+            <h2 class="section-title">Nos Services</h2>
+            <p class="section-subtitle">Des solutions adaptées à vos besoins</p>
+            
+            <div class="services-grid">
+                <div class="card service-card">
+                    <i class="fas fa-car service-icon"></i>
+                    <h3 class="service-title">Vente de Véhicules</h3>
+                    <p class="service-description">
+                        Découvrez notre sélection de véhicules neufs et d'occasion soigneusement inspectés. 
+                        Nous proposons un large choix de marques et modèles pour répondre à tous vos besoins, 
+                        que ce soit pour un usage personnel ou professionnel. Nos conseillers vous accompagnent 
+                        dans votre choix et vous offrent les meilleures conditions d'achat.
+                    </p>
+                    <a href="#vehicles" class="btn">Voir nos véhicules</a>
+                </div>
+                
+                <div class="card service-card">
+                    <i class="fas fa-key service-icon"></i>
+                    <h3 class="service-title">Location de Véhicules</h3>
+                    <p class="service-description">
+                        Besoin d'un véhicule pour une courte durée ? Notre service de location vous propose 
+                        des véhicules fiables et bien entretenus à des tarifs compétitifs, pour des périodes 
+                        allant d'une journée à plusieurs mois.
+                    </p>
+                    <a href="#rent" class="btn">Nos offres de location</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Vehicles Section - Sale -->
+    <!-- Vehicles Section - Sale -->
+<section class="section" id="vehicles">
+  <div class="container">
+      <h2 class="section-title">Véhicules à Vendre</h2>
+      <p class="section-subtitle">Trouvez la voiture de vos rêves</p>
+      
+      <!-- Ce conteneur sera rempli dynamiquement -->
+      <div class="vehicles-grid">
+          <!-- Le contenu sera généré par JavaScript -->
+      </div>
+      
+      <div style="text-align: center; margin-top: 40px;">
+          <a href="#" class="btn">Voir tous les véhicules à vendre</a>
+      </div>
+  </div>
+</section>
+    <!-- Vehicles Section - Rent -->
+   <!-- Vehicles Section - Rent -->
+<section class="section" id="rent" style="background-color: var(--light);">
+  <div class="container">
+      <h2 class="section-title">Véhicules à Louer</h2>
+      <p class="section-subtitle">Des solutions flexibles pour tous vos déplacements</p>
+      
+      <!-- Ce conteneur sera rempli dynamiquement -->
+      <div class="vehicles-grid">
+          <!-- Le contenu sera généré par JavaScript -->
+      </div>
+      
+      <div style="text-align: center; margin-top: 40px;">
+          <a href="#" class="btn">Voir tous les véhicules à louer</a>
+      </div>
+  </div>
+</section>
+    <!-- Why Choose Us -->
+    <section class="section why-choose-us" id="about">
+        <div class="container">
+            <h2 class="section-title">Pourquoi Nous Choisir ?</h2>
+            <p class="section-subtitle">Une expérience client exceptionnelle</p>
+            
+            <div class="features-grid">
+                <div class="card feature-card">
+                    <i class="fas fa-shield-alt feature-icon"></i>
+                    <h3 class="feature-title">Qualité Garantie</h3>
+                    <p class="feature-description">
+                        Tous nos véhicules sont rigoureusement vérifiés et entretenus 
+                        pour vous garantir fiabilité et sécurité sur les routes sénégalaises.
+                    </p>
+                </div>
+                
+                <div class="card feature-card">
+                    <i class="fas fa-tags feature-icon"></i>
+                    <h3 class="feature-title">Prix Compétitifs</h3>
+                    <p class="feature-description">
+                        Nous vous proposons les meilleurs tarifs du marché 
+                        pour l'achat ou la location de véhicules de qualité.
+                    </p>
+                </div>
+                
+                <div class="card feature-card">
+                    <i class="fas fa-headset feature-icon"></i>
+                    <h3 class="feature-title">Service Client Premium</h3>
+                    <p class="feature-description">
+                        Notre équipe de professionnels est à votre disposition 
+                        pour vous conseiller et vous accompagner dans votre projet.
+                    </p>
+                </div>
+                
+                <div class="card feature-card">
+                    <i class="fas fa-tools feature-icon"></i>
+                    <h3 class="feature-title">Service Après-Vente</h3>
+                    <p class="feature-description">
+                        Profitez d'un service après-vente réactif et efficace 
+                        pour l'entretien et les réparations de votre véhicule.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="section testimonials">
+        <div class="container">
+            <h2 class="section-title">Témoignages Clients</h2>
+            <p class="section-subtitle">Ce que disent nos clients</p>
+            
+            <div class="testimonials-grid">
+                <div class="card testimonial-card">
+                    <div class="testimonial-text">
+                        J'ai acheté ma Toyota RAV4 chez NdiambourLocation et je suis extrêmement satisfait. 
+                        Le processus d'achat a été simple et transparent, et la voiture est en parfait état.
+                    </div>
+                    <div class="testimonial-author">Amadou Diop</div>
+                    <div class="testimonial-role">Dakar</div>
+                </div>
+                
+                <div class="card testimonial-card">
+                    <div class="testimonial-text">
+                        Le service de location est excellent ! J'ai loué une voiture pendant deux semaines 
+                        pour mes vacances, et tout s'est parfaitement déroulé. Je recommande vivement.
+                    </div>
+                    <div class="testimonial-author">Marie Sène</div>
+                    <div class="testimonial-role">Saint-Louis</div>
+                </div>
+                
+                <div class="card testimonial-card">
+                    <div class="testimonial-text">
+                        Une équipe professionnelle et à l'écoute. Ils m'ont aidé à trouver le 
+                        véhicule qui correspondait parfaitement à mes besoins et à mon budget.
+                    </div>
+                    <div class="testimonial-author">Ibrahim Fall</div>
+                    <div class="testimonial-role">Thiès</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Admin Access Section -->
+    <section class="section" style="background-color: var(--light); padding: 40px 0;">
+        <div class="container" style="text-align: center;">
+            <h2 class="section-title">Accès Administration</h2>
+            <p class="section-subtitle" style="margin-bottom: 30px;">Connectez-vous pour gérer votre plateforme</p>
+            <a href="admin-panel.html" class="btn" style="font-size: 1.1rem; padding: 15px 30px;">
+                <i class="fas fa-lock" style="margin-right: 10px;"></i> Accéder au panneau d'administration
+            </a>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="section cta">
+        <div class="container">
+            <h2 class="cta-title">Prêt à trouver votre prochain véhicule ?</h2>
+            <p class="cta-description">
+                Que vous souhaitiez acheter ou louer un véhicule, notre équipe est prête à vous accompagner 
+                dans votre projet. Contactez-nous dès aujourd'hui !
+            </p>
+            <a href="#contact" class="btn">Contactez-nous</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer" id="contact">
+      <div class="container">
+          <div class="footer-grid">
+              <div class="footer-col">
+                  <h3>NDIAMBOUR LOCATION</h3>
+                  <p>
+                      Votre partenaire de confiance pour la location de véhicules au Sénégal. 
+                      Des voitures neuves et confortables pour tous vos déplacements.
+                  </p>
+                  <div class="social-links">
+                      <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                      <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                      <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                      <a href="#" class="social-link"><i class="fab fa-whatsapp"></i></a>
+                  </div>
+              </div>
+              
+              <div class="footer-col">
+                  <h3>Liens Rapides</h3>
+                  <ul class="footer-links">
+                      <li class="footer-link"><a href="#home">Accueil</a></li>
+                      <li class="footer-link"><a href="#vehicles">Nos Véhicules</a></li>
+                      <li class="footer-link"><a href="#services">Services</a></li>
+                      <li class="footer-link"><a href="#options">Options</a></li>
+                      <li class="footer-link"><a href="#contact">Contact</a></li>
+                  </ul>
+              </div>
+              
+              <div class="footer-col">
+                  <h3>Nos Services</h3>
+                  <ul class="footer-links">
+                      <li class="footer-link"><a href="#">Location avec chauffeur</a></li>
+                      <li class="footer-link"><a href="#">Location sans chauffeur</a></li>
+                      <li class="footer-link"><a href="#">Voyage & Tourisme</a></li>
+                      <li class="footer-link"><a href="#">Transferts aéroport</a></li>
+                      <li class="footer-link"><a href="#">Excursions touristiques</a></li>
+                  </ul>
+              </div>
+              
+              <div class="footer-col">
+                  <h3>Contact</h3>
+                  <ul class="footer-links">
+                      <li class="footer-link"><i class="fas fa-map-marker-alt"></i> Dakar, Sénégal</li>
+                      <li class="footer-link"><i class="fas fa-phone"></i> +221 77 325 71 97</li>
+                      <li class="footer-link"><i class="fas fa-phone"></i> +221 77 642 64 70</li>
+                      <li class="footer-link"><i class="fas fa-phone"></i> +221 33 854 09 66</li>
+                      <li class="footer-link"><i class="fas fa-envelope"></i> contact@ndiambourlocation.com</li>
+                      <li class="footer-link"><i class="fas fa-clock"></i> Lun-Dim: 8h00 - 20h00</li>
+                  </ul>
+              </div>
+          </div>
+          
+          <div class="copyright">
+              <p>NINEA: 26979122C2 RC: SN-DKR-2007-B-2703</p>
+              <p>&copy; 2025 Ndiambour Location. Tous droits réservés.</p>
+          </div>
+      </div>
+  </footer>
+<!-- Modals pour détails et réservation -->
+
+<!-- Modal Détails du véhicule -->
+<div class="modal" id="detailsModal">
+  <div class="modal-content">
+      <div class="modal-header">
+          <h2 class="modal-title">Détails du véhicule</h2>
+          <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+          <div class="vehicle-details-container">
+              <div class="vehicle-gallery">
+                  <img src="/api/placeholder/600/400" alt="Vue principale" class="main-image">
+                  <div class="gallery-thumbs">
+                      <img src="/api/placeholder/120/80" alt="Extérieur" class="thumb-image">
+                      <img src="/api/placeholder/120/80" alt="Intérieur" class="thumb-image">
+                      <img src="/api/placeholder/120/80" alt="Tableau de bord" class="thumb-image">
+                      <img src="/api/placeholder/120/80" alt="Coffre" class="thumb-image">
+                  </div>
+              </div>
+              <div class="vehicle-info">
+                  <h3 id="details-title">Chargement...</h3>
+                  <div class="price" id="details-price">Prix</div>
+                  
+                  <div class="specs-grid">
+                      <div class="spec-item">
+                          <i class="fas fa-car"></i>
+                          <span>Type</span>
+                          <strong id="details-type">Berline</strong>
+                      </div>
+                      <div class="spec-item">
+                          <i class="fas fa-calendar-alt"></i>
+                          <span>Année</span>
+                          <strong id="details-year">2023</strong>
+                      </div>
+                      <div class="spec-item">
+                          <i class="fas fa-user"></i>
+                          <span>Places</span>
+                          <strong id="details-seats">5</strong>
+                      </div>
+                      <div class="spec-item">
+                          <i class="fas fa-suitcase"></i>
+                          <span>Bagages</span>
+                          <strong id="details-baggage">4</strong>
+                      </div>
+                      <div class="spec-item">
+                          <i class="fas fa-gas-pump"></i>
+                          <span>Carburant</span>
+                          <strong id="details-fuel">Essence</strong>
+                      </div>
+                      <div class="spec-item">
+                          <i class="fas fa-cog"></i>
+                          <span>Transmission</span>
+                          <strong id="details-transmission">Automatique</strong>
+                      </div>
+                      <div class="spec-item">
+                          <i class="fas fa-snowflake"></i>
+                          <span>Climatisation</span>
+                          <strong id="details-ac">Oui</strong>
+                      </div>
+                      <div class="spec-item">
+                          <i class="fas fa-tachometer-alt"></i>
+                          <span>Kilométrage</span>
+                          <strong id="details-mileage">Nouveau</strong>
+                      </div>
+                  </div>
+                  
+                  <div class="description" id="details-description">
+                      Description détaillée du véhicule...
+                  </div>
+                  
+                  <div class="action-buttons">
+                      <button class="btn reserve-from-details">Réserver ce véhicule</button>
+                      <button class="btn btn-outline contact-from-details">Demander plus d'informations</button>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+
+<!-- Modal Formulaire de réservation -->
+<div class="modal" id="reservationModal">
+  <div class="modal-content">
+      <div class="modal-header">
+          <h2 class="modal-title">Réserver un véhicule</h2>
+          <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+          <form id="reservation-form" class="reservation-form">
+              <input type="hidden" id="reservation-vehicle-id" name="vehicleId">
+              
+              <div class="form-group">
+                  <label>Véhicule sélectionné</label>
+                  <input type="text" id="reservation-vehicle" name="vehicle" readonly>
+              </div>
+              
+              <div class="form-row">
+                  <div class="form-group">
+                      <label>Date de prise en charge</label>
+                      <input type="date" id="reservation-start" name="startDate" required>
+                  </div>
+                  <div class="form-group">
+                      <label>Date de restitution</label>
+                      <input type="date" id="reservation-end" name="endDate" required>
+                  </div>
+              </div>
+              
+              <div class="form-group">
+                  <label>Option de service</label>
+                  <div class="radio-group">
+                      <label class="radio-option">
+                          <input type="radio" name="option" value="avec-chauffeur" checked>
+                          <span class="radio-label">Avec chauffeur</span>
+                      </label>
+                      <label class="radio-option">
+                          <input type="radio" name="option" value="sans-chauffeur">
+                          <span class="radio-label">Sans chauffeur</span>
+                      </label>
+                  </div>
+              </div>
+              
+              <div class="form-group">
+                  <label>Lieu de prise en charge</label>
+                  <input type="text" name="pickupLocation" placeholder="Ex: Aéroport, Hôtel..." required>
+              </div>
+              
+              <div class="form-row">
+                  <div class="form-group">
+                      <label>Nom complet</label>
+                      <input type="text" name="fullName" placeholder="Votre nom complet" required>
+                  </div>
+                  <div class="form-group">
+                      <label>Téléphone</label>
+                      <input type="tel" name="phone" placeholder="+221 XX XXX XX XX" required>
+                  </div>
+              </div>
+              
+              <div class="form-group">
+                  <label>Email</label>
+                  <input type="email" name="email" placeholder="votre@email.com" required>
+              </div>
+              
+              <div class="form-group">
+                  <label>Message supplémentaire</label>
+                  <textarea name="message" placeholder="Informations complémentaires (optionnel)"></textarea>
+              </div>
+              
+              <div class="form-checkbox">
+                  <input type="checkbox" id="terms" name="terms" required>
+                  <label for="terms">J'accepte les conditions générales et comprends qu'une caution sera demandée</label>
+              </div>
+              
+              <div class="form-actions">
+                  <button type="submit" class="btn">Soumettre la demande</button>
+              </div>
+          </form>
+      </div>
+  </div>
+</div>
+
+<!-- Modal Formulaire de contact -->
+<div class="modal" id="contactModal">
+  <div class="modal-content">
+      <div class="modal-header">
+          <h2 class="modal-title">Nous contacter</h2>
+          <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+          <div class="contact-grid">
+              <div class="contact-info">
+                  <div class="contact-item">
+                      <i class="fas fa-map-marker-alt"></i>
+                      <div>
+                          <h4>Adresse</h4>
+                          <p>Dakar, Sénégal</p>
+                      </div>
+                  </div>
+                  <div class="contact-item">
+                      <i class="fas fa-phone-alt"></i>
+                      <div>
+                          <h4>Téléphone</h4>
+                          <p>+221 77 325 71 97</p>
+                          <p>+221 77 642 64 70</p>
+                          <p>+221 33 854 09 66</p>
+                      </div>
+                  </div>
+                  <div class="contact-item">
+                      <i class="fas fa-envelope"></i>
+                      <div>
+                          <h4>Email</h4>
+                          <p>contact@ndiambourlocation.com</p>
+                      </div>
+                  </div>
+                  <div class="contact-item">
+                      <i class="fas fa-clock"></i>
+                      <div>
+                          <h4>Horaires</h4>
+                          <p>Lun-Dim: 8h00 - 20h00</p>
+                      </div>
+                  </div>
+              </div>
+              
+              <form id="contact-form" class="contact-form">
+                  <input type="hidden" id="contact-vehicle-id" name="vehicleId">
+                  <input type="hidden" id="contact-vehicle-name" name="vehicleName">
+                  
+                  <div class="form-group">
+                      <label>Sujet</label>
+                      <input type="text" id="contact-subject" name="subject" placeholder="Objet de votre message" required>
+                  </div>
+                  
+                  <div class="form-row">
+                      <div class="form-group">
+                          <label>Nom complet</label>
+                          <input type="text" name="fullName" placeholder="Votre nom complet" required>
+                      </div>
+                      <div class="form-group">
+                          <label>Téléphone</label>
+                          <input type="tel" name="phone" placeholder="+221 XX XXX XX XX" required>
+                      </div>
+                  </div>
+                  
+                  <div class="form-group">
+                      <label>Email</label>
+                      <input type="email" name="email" placeholder="votre@email.com" required>
+                  </div>
+                  
+                  <div class="form-group">
+                      <label>Message</label>
+                      <textarea name="message" placeholder="Votre message..." required></textarea>
+                  </div>
+                  
+                  <div class="form-actions">
+                      <button type="submit" class="btn">Envoyer le message</button>
+                  </div>
+              </form>
+          </div>
+      </div>
+  </div>
+</div>
+    <!-- JavaScript -->
+    <script>
+    // Clés de stockage localStorage
+const KEYS = {
+  IMGS: 'autosenegal_images',
+  VEHS: 'autosenegal_vehicles',
+  CATS: 'autosenegal_categories',
+  SETS: 'autosenegal_settings'
+};
+
+// Service de données optimisé
+const DataService = {
+  init() {
+    if (!localStorage.getItem(KEYS.IMGS)) localStorage.setItem(KEYS.IMGS, JSON.stringify([]));
+    if (!localStorage.getItem(KEYS.VEHS)) localStorage.setItem(KEYS.VEHS, JSON.stringify([]));
+    
+    if (!localStorage.getItem(KEYS.CATS)) {
+      const defaultCategories = [
+        { id: 'vehicles', name: 'Véhicules', icon: 'fas fa-car', count: 0 },
+        { id: 'interiors', name: 'Intérieurs', icon: 'fas fa-couch', count: 0 },
+        { id: 'exteriors', name: 'Extérieurs', icon: 'fas fa-car-side', count: 0 },
+        { id: 'others', name: 'Autres', icon: 'fas fa-images', count: 0 }
+      ];
+      localStorage.setItem(KEYS.CATS, JSON.stringify(defaultCategories));
+    }
+    
+    if (!localStorage.getItem(KEYS.SETS)) {
+      localStorage.setItem(KEYS.SETS, JSON.stringify({
+        siteName: 'Ndiambour Location',
+        currency: 'FCFA',
+        language: 'fr'
+      }));
+    }
+    
+    console.log('DataService: Données initialisées');
+    
+    // Ajouter des données de test si nécessaire et si le stockage est vide
+    this.addSampleData();
+  },
+  
+  // Ajouter des données de test pour la démo
+  addSampleData() {
+    const vehicles = this.getAllVehicles();
+    if (vehicles.length === 0) {
+      // Quelques véhicules pour la démonstration
+      const sampleVehicles = [
+        { 
+          id: 'vehicle-001', 
+          make: 'Toyota', 
+          model: 'RAV4', 
+          year: '2023', 
+          type: 'sale', 
+          price: 12500000, 
+          mileage: 1500, 
+          fuel: 'Essence', 
+          transmission: 'Automatique',
+          seats: 5,
+          baggage: 4,
+          hasAC: true,
+          images: [],
+          description: 'Toyota RAV4 en excellent état avec toutes options. Parfait pour les familles et les voyages.'
+        },
+        { 
+          id: 'vehicle-002', 
+          make: 'Nissan', 
+          model: 'Qashqai', 
+          year: '2022', 
+          type: 'rent', 
+          price: 35000, 
+          mileage: 15000, 
+          fuel: 'Diesel', 
+          transmission: 'Manuelle',
+          seats: 5,
+          baggage: 3,
+          hasAC: true,
+          images: [],
+          description: 'Le Nissan Qashqai est un SUV compact idéal pour vos déplacements à Dakar et alentours.'
+        },
+        { 
+          id: 'vehicle-003', 
+          make: 'Hyundai', 
+          model: 'Tucson', 
+          year: '2022', 
+          type: 'sale', 
+          price: 11900000, 
+          mileage: 3500, 
+          fuel: 'Essence', 
+          transmission: 'Automatique',
+          seats: 5,
+          baggage: 4,
+          hasAC: true,
+          images: [],
+          description: 'Le Hyundai Tucson est un SUV fiable et économique, parfait pour les routes sénégalaises.'
+        },
+        { 
+          id: 'vehicle-004', 
+          make: 'Kia', 
+          model: 'Sportage', 
+          year: '2023', 
+          type: 'rent', 
+          price: 40000, 
+          mileage: 8000, 
+          fuel: 'Diesel', 
+          transmission: 'Automatique',
+          seats: 5,
+          baggage: 4,
+          hasAC: true,
+          images: [],
+          description: 'Location de Kia Sportage de dernière génération. Véhicule spacieux et confortable.'
+        }
+      ];
+      
+      sampleVehicles.forEach(vehicle => this.addVehicle(vehicle));
+      console.log('Données de test ajoutées:', sampleVehicles.length, 'véhicules');
+    }
+  },
+  
+  getAllImages() { return JSON.parse(localStorage.getItem(KEYS.IMGS) || '[]'); },
+  getImagesByCategory(cat) { return this.getAllImages().filter(img => cat === 'all' || img.category === cat); },
+  getImagesByVehicle(vehId) { return this.getAllImages().filter(img => img.vehicleId === vehId); },
+  getImageById(imgId) { return this.getAllImages().find(img => img.id === imgId); },
+  
+  getAllVehicles() { return JSON.parse(localStorage.getItem(KEYS.VEHS) || '[]'); },
+  getVehicleById(vehId) { return this.getAllVehicles().find(v => v.id === vehId); },
+  
+  addVehicle(vehicleData) {
+    const vehicles = this.getAllVehicles();
+    
+    if (!vehicleData.id) vehicleData.id = 'vehicle-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+    if (!vehicleData.images) vehicleData.images = [];
+    if (!vehicleData.dateAdded) vehicleData.dateAdded = new Date().toISOString();
+    
+    vehicles.push(vehicleData);
+    localStorage.setItem(KEYS.VEHS, JSON.stringify(vehicles));
+    
+    return vehicleData;
+  },
+  
+  // Autres méthodes du DataService...
+};
+
+// GESTIONNAIRE DE SITE - Toutes les fonctions pour faire fonctionner la vitrine
+const SiteManager = {
+  init() {
+    // Initialiser les principaux composants
+    this.setupMenus();
+    this.setupAnimations();
+    this.renderVehicles();
+    this.setupModals();
+  },
+  
+  // Configuration du menu mobile et des événements de navigation
+  setupMenus() {
+    const menuButton = document.getElementById('menu-button');
+    const menu = document.getElementById('menu');
+    
+    if (menuButton && menu) {
+      menuButton.addEventListener('click', () => {
+        menu.classList.toggle('active');
+        menuButton.innerHTML = menu.classList.contains('active') 
+          ? '<i class="fas fa-times"></i>' 
+          : '<i class="fas fa-bars"></i>';
+      });
+    }
+    
+    // Défilement fluide pour les ancres
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', e => {
+        const targetId = anchor.getAttribute('href');
+        if (targetId === '#') return;
+        
+        const targetElement = document.querySelector(targetId);
+        if (targetElement) {
+          e.preventDefault();
+          
+          // Fermer le menu mobile si ouvert
+          if (menu) menu.classList.remove('active');
+          if (menuButton) menuButton.innerHTML = '<i class="fas fa-bars"></i>';
+          
+          window.scrollTo({
+            top: targetElement.offsetTop - 80,
+            behavior: 'smooth'
+          });
+        }
+      });
+    });
+    
+    // Sélecteur de pays
+    document.querySelectorAll('.country-option').forEach(option => {
+      option.addEventListener('click', () => {
+        const currentCountry = document.querySelector('.current-country');
+        if (currentCountry) currentCountry.innerHTML = option.innerHTML;
+      });
+    });
+  },
+  
+  // Animation des cartes au défilement
+  setupAnimations() {
+    const cards = document.querySelectorAll('.card');
+    
+    // Configuration initiale
+    cards.forEach(card => {
+      card.style.opacity = '0';
+      card.style.transform = 'translateY(20px)';
+      card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    });
+    
+    // Fonction d'animation au défilement
+    const animateOnScroll = () => {
+      cards.forEach(card => {
+        const cardTop = card.getBoundingClientRect().top;
+        const windowHeight = window.innerHeight;
+        
+        if (cardTop < windowHeight - 100) {
+          card.style.opacity = '1';
+          card.style.transform = 'translateY(0)';
+        }
+      });
+    };
+    
+    // Initialiser les animations
+    window.addEventListener('scroll', animateOnScroll);
+    // Déclencher une fois au chargement
+    setTimeout(animateOnScroll, 200);
+  },
+  
+  // Affichage des véhicules
+  renderVehicles() {
+    const saleContainer = document.querySelector('#vehicles .vehicles-grid');
+    const rentContainer = document.querySelector('#rent .vehicles-grid');
+    
+    if (!saleContainer && !rentContainer) return;
+    
+    // Vider les conteneurs
+    if (saleContainer) saleContainer.innerHTML = '';
+    if (rentContainer) rentContainer.innerHTML = '';
+    
+    // Récupérer tous les véhicules
+    const vehicles = DataService.getAllVehicles();
+    
+    if (vehicles.length === 0) {
+      const emptyMessage = '<div class="card vehicle-card"><div class="vehicle-content"><h3>Aucun véhicule disponible</h3><p>Visitez plus tard ou contactez-nous pour plus d\'informations.</p></div></div>';
+      
+      if (saleContainer) saleContainer.innerHTML = emptyMessage;
+      if (rentContainer) rentContainer.innerHTML = emptyMessage;
+      return;
+    }
+    
+    // Filtrer et afficher par type
+    const saleVehicles = vehicles.filter(v => v.type === 'sale');
+    const rentVehicles = vehicles.filter(v => v.type === 'rent');
+    
+    // Afficher les véhicules à vendre (3 maximum)
+    if (saleContainer) {
+      if (saleVehicles.length === 0) {
+        saleContainer.innerHTML = '<div class="card vehicle-card"><div class="vehicle-content"><h3>Aucun véhicule à vendre disponible</h3><p>Visitez plus tard ou contactez-nous pour plus d\'informations.</p></div></div>';
+      } else {
+        saleVehicles.slice(0, 3).forEach(vehicle => {
+          saleContainer.appendChild(this.createVehicleCard(vehicle, 'sale'));
+        });
+      }
+    }
+    
+    // Afficher les véhicules à louer (3 maximum)
+    if (rentContainer) {
+      if (rentVehicles.length === 0) {
+        rentContainer.innerHTML = '<div class="card vehicle-card"><div class="vehicle-content"><h3>Aucun véhicule à louer disponible</h3><p>Visitez plus tard ou contactez-nous pour plus d\'informations.</p></div></div>';
+      } else {
+        rentVehicles.slice(0, 3).forEach(vehicle => {
+          rentContainer.appendChild(this.createVehicleCard(vehicle, 'rent'));
+        });
+      }
+    }
+    
+    // Configurer les boutons après rendus
+    this.setupVehicleButtons();
+  },
+  
+  // Créer une carte de véhicule
+  createVehicleCard(vehicle, type) {
+    const card = document.createElement('div');
+    card.className = 'card vehicle-card';
+    
+    // Trouver l'image principale
+    let imageSrc = '/api/placeholder/400/320';
+    if (vehicle.images && vehicle.images.length > 0) {
+      const vehicleImage = DataService.getImageById(vehicle.images[0]);
+      if (vehicleImage && vehicleImage.src) {
+        imageSrc = vehicleImage.src;
+      }
+    }
+    
+    // Formater le prix
+    const priceValue = parseFloat(vehicle.price) || 0;
+    const formattedPrice = type === 'sale' 
+      ? `${priceValue.toLocaleString()} FCFA` 
+      : `${priceValue.toLocaleString()} FCFA / jour`;
+    
+    // Contenu HTML
+    card.innerHTML = `
+      <img src="${imageSrc}" alt="${vehicle.make} ${vehicle.model}" class="vehicle-image" onerror="this.src='/api/placeholder/400/320'">
+      <div class="vehicle-overlay">
+  ${vehicle.type === 'rent' ? '<span>Disponible</span>' : ''}
+</div>      <div class="vehicle-content">
+        <h3 class="vehicle-title">${vehicle.make} ${vehicle.model} ${vehicle.year || ''}</h3>
+        <p class="vehicle-price">${formattedPrice}</p>
+        <div class="vehicle-features">
+          ${type === 'sale' ? `
+            <span class="vehicle-feature"><i class="fas fa-tachometer-alt"></i> ${vehicle.mileage || '0'} km</span>
+            <span class="vehicle-feature"><i class="fas fa-gas-pump"></i> ${vehicle.fuel || 'Non spécifié'}</span>
+            <span class="vehicle-feature"><i class="fas fa-cog"></i> ${vehicle.transmission || 'Non spécifié'}</span>
+          ` : `
+            <span class="vehicle-feature"><i class="fas fa-user"></i> ${vehicle.seats || '5'} places</span>
+            <span class="vehicle-feature"><i class="fas fa-suitcase"></i> ${vehicle.baggage || '4'} bagages</span>
+            <span class="vehicle-feature"><i class="fas fa-snowflake"></i> Climatisé</span>
+          `}
+        </div>
+        <div class="vehicle-buttons">
+          <a href="#" class="btn" data-id="${vehicle.id}">${type === 'sale' ? 'Détails' : 'Réserver'}</a>
+          <a href="#" class="btn btn-outline" data-id="${vehicle.id}">${type === 'sale' ? 'Contacter' : "Plus d'infos"}</a>
+        </div>
+      </div>
+    `;
+    
+    return card;
+  },
+  
+  // Configurer les boutons des véhicules
+  setupVehicleButtons() {
+    // Boutons détails (non outline)
+    document.querySelectorAll('.btn[data-id]').forEach(btn => {
+      if (!btn.classList.contains('btn-outline')) {
+        btn.addEventListener('click', e => {
+          e.preventDefault();
+          const vehicleId = btn.getAttribute('data-id');
+          const text = btn.textContent.trim();
+          
+          if (text === 'Détails') {
+            this.openDetailsModal(vehicleId);
+          } else if (text === 'Réserver') {
+            this.openReservationModal(vehicleId);
+          }
+        });
+      } else {
+        // Boutons "Contacter" ou "Plus d'infos"
+        btn.addEventListener('click', e => {
+          e.preventDefault();
+          const vehicleId = btn.getAttribute('data-id');
+          this.openContactModal(vehicleId);
+        });
+      }
+    });
+  },
+  
+  // Configuration des modaux
+  setupModals() {
+    // Boutons dans les modaux
+    document.querySelectorAll('.reserve-from-details').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const vehicleId = document.querySelector('#detailsModal').getAttribute('data-vehicle-id');
+        this.closeAllModals();
+        setTimeout(() => this.openReservationModal(vehicleId), 300);
+      });
+    });
+    
+    document.querySelectorAll('.contact-from-details').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const vehicleId = document.querySelector('#detailsModal').getAttribute('data-vehicle-id');
+        this.closeAllModals();
+        setTimeout(() => this.openContactModal(vehicleId), 300);
+      });
+    });
+    
+    // Fermeture des modaux
+    document.querySelectorAll('.modal-close').forEach(btn => {
+      btn.addEventListener('click', () => this.closeAllModals());
+    });
+    
+    document.querySelectorAll('.modal').forEach(modal => {
+      modal.addEventListener('click', e => {
+        if (e.target === modal) this.closeAllModals();
+      });
+    });
+    
+    // Initialisation des dates pour la réservation
+    this.initReservationDates();
+    
+    // Gestion des formulaires
+    this.setupForms();
+  },
+  
+  // Initialisation des dates pour le formulaire de réservation
+  initReservationDates() {
+    const startDateInput = document.getElementById('reservation-start');
+    const endDateInput = document.getElementById('reservation-end');
+    
+    if (!startDateInput || !endDateInput) return;
+    
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+    
+    // Format YYYY-MM-DD
+    const formatDate = date => {
+      return date.toISOString().split('T')[0];
+    };
+    
+    // Initialiser les valeurs
+    startDateInput.min = formatDate(today);
+    startDateInput.value = formatDate(today);
+    endDateInput.min = formatDate(tomorrow);
+    endDateInput.value = formatDate(tomorrow);
+    
+    // Mettre à jour la date de fin lorsque la date de début change
+    startDateInput.addEventListener('change', function() {
+      const startDate = new Date(this.value);
+      const newMinEndDate = new Date(startDate);
+      newMinEndDate.setDate(startDate.getDate() + 1);
+      
+      endDateInput.min = formatDate(newMinEndDate);
+      if (new Date(endDateInput.value) < newMinEndDate) {
+        endDateInput.value = formatDate(newMinEndDate);
+      }
+    });
+  },
+  
+  // Configuration des formulaires
+  setupForms() {
+    // Formulaire de réservation
+    const reservationForm = document.getElementById('reservation-form');
+    if (reservationForm) {
+      reservationForm.addEventListener('submit', e => {
+        e.preventDefault();
+        const formData = new FormData(reservationForm);
+        const data = Object.fromEntries(formData.entries());
+        
+        console.log('Données de réservation:', data);
+        alert('Votre demande de réservation a été envoyée avec succès! Nous vous contacterons sous peu pour confirmer les détails.');
+        this.closeAllModals();
+      });
+    }
+    
+    // Formulaire de contact
+    const contactForm = document.getElementById('contact-form');
+    if (contactForm) {
+      contactForm.addEventListener('submit', e => {
+        e.preventDefault();
+        const formData = new FormData(contactForm);
+        const data = Object.fromEntries(formData.entries());
+        
+        console.log('Données de contact:', data);
+        alert('Votre message a été envoyé avec succès! Nous vous répondrons dans les plus brefs délais.');
+        this.closeAllModals();
+      });
+    }
+  },
+  
+  // Ouvrir le modal détails
+  openDetailsModal(vehicleId) {
+    const vehicle = DataService.getVehicleById(vehicleId);
+    if (!vehicle) {
+      console.error(`Véhicule avec ID ${vehicleId} non trouvé`);
+      return;
+    }
+    
+    const modal = document.getElementById('detailsModal');
+    modal.setAttribute('data-vehicle-id', vehicleId);
+    
+    // Mettre à jour les détails
+    document.getElementById('details-title').textContent = `${vehicle.make} ${vehicle.model} ${vehicle.year || ''}`;
+    document.getElementById('details-price').textContent = this.formatPrice(vehicle.price, vehicle.type);
+    document.getElementById('details-type').textContent = vehicle.type === 'rent' ? 'Location' : 'Vente';
+    document.getElementById('details-year').textContent = vehicle.year || 'N/A';
+    document.getElementById('details-seats').textContent = vehicle.seats || '5';
+    document.getElementById('details-baggage').textContent = vehicle.baggage || '4';
+    document.getElementById('details-fuel').textContent = vehicle.fuel || 'Essence';
+    document.getElementById('details-transmission').textContent = vehicle.transmission || 'Automatique';
+    document.getElementById('details-ac').textContent = vehicle.hasAC ? 'Oui' : 'Non';
+    document.getElementById('details-mileage').textContent = vehicle.mileage ? `${vehicle.mileage} km` : 'Nouveau';
+    document.getElementById('details-description').textContent = vehicle.description || 
+      `Découvrez notre ${vehicle.make} ${vehicle.model} ${vehicle.year || ''}, un véhicule parfait pour vos déplacements au Sénégal.`;
+    
+    // Mettre à jour les images
+    this.updateGallery(vehicleId);
+    
+    // Afficher le modal
+    modal.classList.add('active');
+  },
+  
+  // Mettre à jour la galerie d'images
+  updateGallery(vehicleId) {
+    const vehicle = DataService.getVehicleById(vehicleId);
+    const mainImage = document.querySelector('.main-image');
+    const galleryThumbs = document.querySelector('.gallery-thumbs');
+    
+    if (!mainImage || !galleryThumbs) return;
+    
+    // Obtenir les URLs des images
+    let images = ['/api/placeholder/600/400'];
+    
+    if (vehicle && vehicle.images && vehicle.images.length > 0) {
+      const vehicleImages = vehicle.images.map(imgId => {
+        const img = DataService.getImageById(imgId);
+        return img && img.src ? img.src : '/api/placeholder/600/400';
+      });
+      
+      if (vehicleImages.length > 0) {
+        images = vehicleImages;
+      }
+    }
+    
+    // Mettre à jour l'image principale
+    mainImage.src = images[0];
+    mainImage.alt = `Vue principale - ${vehicle.make} ${vehicle.model}`;
+    
+    // Mettre à jour les miniatures
+    galleryThumbs.innerHTML = '';
+    
+    images.forEach((src, index) => {
+      const img = document.createElement('img');
+      img.src = src;
+      img.alt = `Vue ${index + 1}`;
+      img.className = index === 0 ? 'thumb-image active' : 'thumb-image';
+      img.dataset.src = src;
+      
+      img.addEventListener('click', function() {
+        // Désactiver toutes les miniatures
+        document.querySelectorAll('.thumb-image').forEach(thumb => {
+          thumb.classList.remove('active');
+        });
+        
+        // Activer celle-ci
+        this.classList.add('active');
+        
+        // Mettre à jour l'image principale
+        mainImage.src = this.dataset.src;
+      });
+      
+      galleryThumbs.appendChild(img);
+    });
+  },
+  
+  // Ouvrir le modal de réservation
+  openReservationModal(vehicleId) {
+    const vehicle = DataService.getVehicleById(vehicleId);
+    if (!vehicle) return;
+    
+    const vehicleFullName = `${vehicle.make} ${vehicle.model} ${vehicle.year || ''}`;
+    
+    document.getElementById('reservation-vehicle-id').value = vehicleId;
+    document.getElementById('reservation-vehicle').value = vehicleFullName;
+    
+    document.getElementById('reservationModal').classList.add('active');
+  },
+  
+  // Ouvrir le modal de contact
+  openContactModal(vehicleId) {
+    const vehicle = DataService.getVehicleById(vehicleId);
+    if (!vehicle) return;
+    
+    const vehicleFullName = `${vehicle.make} ${vehicle.model} ${vehicle.year || ''}`;
+    
+    document.getElementById('contact-vehicle-id').value = vehicleId;
+    document.getElementById('contact-vehicle-name').value = vehicleFullName;
+    document.getElementById('contact-subject').value = `Demande d'informations - ${vehicleFullName}`;
+    
+    document.getElementById('contactModal').classList.add('active');
+  },
+  
+  // Fermer tous les modaux
+  closeAllModals() {
+    document.querySelectorAll('.modal').forEach(modal => {
+      modal.classList.remove('active');
+    });
+  },
+  
+  // Formater le prix selon le type de véhicule
+  formatPrice(price, type) {
+    if (!price) return 'Prix sur demande';
+    
+    const formattedPrice = typeof price === 'number' ? 
+      price.toLocaleString() : 
+      price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+    
+    return type === 'rent' ? 
+      `${formattedPrice} FCFA / jour` : 
+      `${formattedPrice} FCFA`;
+  }
+};
+
+// Initialisation au chargement de la page
+document.addEventListener('DOMContentLoaded', () => {
+  // Initialiser le service de données
+  DataService.init();
+  
+  // Initialiser le gestionnaire de site
+  SiteManager.init();
+});
+
+    </script>
+</body>
+</html>

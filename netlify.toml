@@ -1,0 +1,56 @@
+# Configuration principale de build
+[build]
+  # Le répertoire à partir duquel publier le site (généralement le répertoire racine pour un site statique simple)
+  publish = "."
+  # Commande de build (vide car il s'agit d'un site statique simple)
+  command = ""
+
+# Configuration de redirection
+[[redirects]]
+  # Toutes les routes non trouvées seront redirigées vers index.html (pour le SPA routing)
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# En-têtes HTTP personnalisés
+[[headers]]
+  # Définir des en-têtes pour tous les fichiers
+  for = "/*"
+  [headers.values]
+    # Amélioration de la sécurité
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "no-referrer-when-downgrade"
+    # Activer le partage de ressources entre domaines 
+    Access-Control-Allow-Origin = "*"
+
+# En-têtes spécifiques pour les ressources statiques
+[[headers]]
+  for = "*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "*.jpg"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "*.png"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Paramètres de fonction Netlify (si vous décidez d'ajouter des fonctions serverless plus tard)
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+# Variables d'environnement pour le build
+[build.environment]
+  NODE_VERSION = "18"

@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 200">
+  <!-- Fond transparent -->
+  <rect width="500" height="200" fill="none"/>
+  
+  <!-- Carrosserie de la voiture - forme stylisée bleue -->
+  <path d="M120 110 C140 75, 240 75, 330 110 L370 110 C380 110, 390 100, 390 90 L390 75 C390 65, 380 60, 370 60 L330 60 C320 60, 310 55, 300 45 L200 45 C180 45, 160 60, 145 60 L110 60 C100 60, 90 65, 90 75 L90 90 C90 100, 100 110, 110 110 Z" fill="#1565C0"/>
+  
+  <!-- Détails de la voiture - vitre/fenêtre -->
+  <path d="M190 65 L290 65 C300 65, 310 70, 315 80 L165 80 C170 70, 180 65, 190 65 Z" fill="#0D47A1"/>
+  
+  <!-- Phare avant -->
+  <circle cx="105" cy="80" r="8" fill="#FFEB3B"/>
+  
+  <!-- Phare arrière -->
+  <rect x="370" y="75" width="10" height="15" rx="5" fill="#F44336"/>
+  
+  <!-- Première roue "N" -->
+  <circle cx="150" cy="110" r="25" fill="#333"/>
+  <circle cx="150" cy="110" r="18" fill="#777"/>
+  <text x="138" y="120" font-family="Arial" font-size="28" font-weight="bold" fill="white">N</text>
+  
+  <!-- Deuxième roue "L" -->
+  <circle cx="330" cy="110" r="25" fill="#333"/>
+  <circle cx="330" cy="110" r="18" fill="#777"/>
+  <text x="323" y="120" font-family="Arial" font-size="28" font-weight="bold" fill="white">L</text>
+  
+  <!-- Texte du logo -->
+  <text x="250" y="160" font-family="Arial" font-size="24" font-weight="bold" text-anchor="middle" fill="#1565C0">NDIAMBOUR LOCATION</text>
+  
+  <!-- Ligne décorative -->
+  <line x1="130" y1="175" x2="370" y2="175" stroke="#1565C0" stroke-width="3"/>
+</svg>

@@ -1,0 +1,2067 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionnaire d'Images - AutoSénégal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Variables et réinitialisation */
+        :root {
+            --primary-color: #007C5A; /* Vert, couleur du drapeau sénégalais */
+            --secondary-color: #FFCE00; /* Jaune, couleur du drapeau sénégalais */
+            --accent-color: #CF0921; /* Rouge, couleur du drapeau sénégalais */
+            --light: #F5F5F5;
+            --dark: #333333;
+            --gray: #F0F2F5;
+            --shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--gray);
+            color: var(--dark);
+            min-height: 100vh;
+        }
+
+        /* Header styles */
+        .header {
+            background-color: white;
+            box-shadow: var(--shadow);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--primary-color);
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+
+        .logo i {
+            margin-right: 10px;
+            font-size: 1.8rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--dark);
+            padding: 8px 12px;
+            border-radius: 5px;
+            transition: var(--transition);
+        }
+
+        .nav-link:hover {
+            background-color: var(--light);
+        }
+
+        .nav-link.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 40px 0;
+        }
+
+        .page-title {
+            margin-bottom: 30px;
+            font-size: 2rem;
+            color: var(--dark);
+        }
+
+        /* Image Management */
+        .image-management-section {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .section-content {
+            padding: 20px;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            background-color: var(--light);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            flex-grow: 1;
+        }
+
+        .tab.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* Image Upload */
+        .upload-container {
+            border: 2px dashed rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            background-color: var(--light);
+            transition: var(--transition);
+            margin-bottom: 30px;
+        }
+
+        .upload-container:hover {
+            border-color: var(--primary-color);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            margin-bottom: 20px;
+        }
+
+        .upload-text h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .upload-text p {
+            color: #777;
+        }
+
+        .upload-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            border: none;
+            transition: var(--transition);
+        }
+
+        .upload-btn:hover {
+            background-color: #006547;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        /* Image Gallery */
+        .images-filters {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background-color: var(--light);
+            border-radius: 50px;
+            padding: 8px 15px;
+            max-width: 400px;
+            flex-grow: 1;
+        }
+
+        .search-bar input {
+            border: none;
+            background-color: transparent;
+            outline: none;
+            padding: 5px 10px;
+            width: 100%;
+        }
+
+        .search-bar i {
+            color: #777;
+        }
+
+        .filter-dropdown {
+            position: relative;
+        }
+
+        .filter-btn {
+            display: flex;
+            align-items: center;
+            padding: 8px 15px;
+            background-color: white;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .filter-btn:hover {
+            background-color: var(--light);
+        }
+
+        .filter-btn i {
+            margin-left: 8px;
+        }
+
+        .image-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .image-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            transition: var(--transition);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            position: relative;
+        }
+
+        .image-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-thumbnail {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .image-checkbox {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            background-color: white;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            transition: var(--transition);
+        }
+
+        .image-checkbox.checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .image-checkbox.checked::after {
+            content: '\f00c';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            color: white;
+            font-size: 12px;
+        }
+
+        .image-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 5px;
+        }
+
+        .image-action {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--dark);
+            border: none;
+        }
+
+        .image-action:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .image-info {
+            padding: 15px;
+        }
+
+        .image-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .image-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #777;
+        }
+
+        /* Batch Actions */
+        .batch-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            background-color: var(--light);
+            padding: 15px;
+            border-radius: 5px;
+        }
+
+        .selected-count {
+            font-size: 0.9rem;
+            color: #777;
+        }
+
+        .batch-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .batch-btn {
+            padding: 8px 15px;
+            background-color: white;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .batch-btn:hover {
+            background-color: var(--light);
+        }
+
+        .batch-btn.delete {
+            color: #f44336;
+        }
+
+        .batch-btn.delete:hover {
+            background-color: rgba(244, 67, 54, 0.1);
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin-top: 30px;
+        }
+
+        .pagination-btn {
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            background-color: white;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .pagination-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Image Categories */
+        .categories-section {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            margin-top: 30px;
+        }
+
+        .categories-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .category-card {
+            background-color: var(--light);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+        }
+
+        .category-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+
+        .category-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .category-count {
+            font-size: 0.9rem;
+            color: #777;
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 700px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transform: translateY(-20px);
+            transition: all 0.3s ease;
+        }
+
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #777;
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            color: var(--accent-color);
+        }
+
+        .modal-body {
+            padding: 20px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .modal-footer {
+            padding: 15px 20px;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        /* Image Detail View */
+        .image-detail {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+
+        .image-preview {
+            flex-basis: 300px;
+            flex-grow: 1;
+        }
+
+        .preview-img {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+            box-shadow: var(--shadow);
+        }
+
+        .image-info-panel {
+            flex-basis: 300px;
+            flex-grow: 1;
+        }
+
+        .info-group {
+            margin-bottom: 20px;
+        }
+
+        .info-label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .info-value {
+            color: #777;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 124, 90, 0.1);
+        }
+
+        .form-helper {
+            font-size: 0.8rem;
+            color: #777;
+            margin-top: 5px;
+        }
+
+        /* Messages d'état vide */
+        .empty-gallery {
+            text-align: center;
+            padding: 40px 20px;
+            color: #777;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .image-detail {
+                flex-direction: column;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="admin-panel.html" class="logo">
+                    <i class="fas fa-car"></i>
+                    <span>AutoSénégal Admin</span>
+                </a>
+                <nav class="nav-links">
+                    <a href="admin-panel.html" class="nav-link">Tableau de bord</a>
+                    <a href="admin-panel.html#vehicles" class="nav-link">Véhicules</a>
+                    <a href="image-management.html" class="nav-link active">Images</a>
+                    <a href="admin-panel.html#reservations" class="nav-link">Réservations</a>
+                    <a href="index.html" class="nav-link" target="_blank">Voir le site</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <h1 class="page-title">Gestionnaire d'Images</h1>
+
+            <!-- Image Management Section -->
+            <section class="image-management-section">
+                <div class="section-header">
+                    <h2 class="section-title">Bibliothèque d'Images</h2>
+                </div>
+                <div class="section-content">
+                    <!-- Tabs -->
+                    <div class="tabs">
+                        <div class="tab active" data-tab="all">Toutes les images</div>
+                        <div class="tab" data-tab="vehicles">Véhicules</div>
+                        <div class="tab" data-tab="interiors">Intérieurs</div>
+                        <div class="tab" data-tab="exteriors">Extérieurs</div>
+                        <div class="tab" data-tab="others">Autres</div>
+                    </div>
+
+                    <!-- Upload Container -->
+                    <div class="upload-container" id="uploadArea">
+                        <div class="upload-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <div class="upload-text">
+                            <h3>Télécharger des images</h3>
+                            <p>Glissez-déposez vos images ici ou cliquez pour parcourir vos fichiers</p>
+                        </div>
+                        <button class="upload-btn" id="browseFiles">Parcourir les fichiers</button>
+                        <input type="file" id="fileInput" class="file-input" multiple accept="image/*">
+                    </div>
+
+                    <!-- Images Filters -->
+                    <div class="images-filters">
+                        <div class="search-bar">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="Rechercher des images...">
+                        </div>
+                        <div class="filter-dropdown">
+                            <button class="filter-btn">
+                                Trier par <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Image Gallery - Vidé car les images seront générées dynamiquement -->
+                    <div class="image-gallery">
+                        <!-- Le contenu sera généré dynamiquement par JavaScript -->
+                    </div>
+
+                    <!-- Batch Actions -->
+                    <div class="batch-actions">
+                        <div class="selected-count">0 images sélectionnées</div>
+                        <div class="batch-buttons">
+                            <button class="batch-btn" id="assignCategoryBtn" disabled>
+                                <i class="fas fa-folder"></i> Assigner catégorie
+                            </button>
+                            <button class="batch-btn" id="downloadBtn" disabled>
+                                <i class="fas fa-download"></i> Télécharger
+                            </button>
+                            <button class="batch-btn delete" id="deleteSelectedBtn" disabled>
+                                <i class="fas fa-trash-alt"></i> Supprimer
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="pagination">
+                        <button class="pagination-btn" disabled><i class="fas fa-chevron-left"></i></button>
+                        <button class="pagination-btn active">1</button>
+                        <button class="pagination-btn">2</button>
+                        <button class="pagination-btn">3</button>
+                        <button class="pagination-btn"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Categories Section - Vidée car le contenu sera généré dynamiquement -->
+            <section class="categories-section">
+                <div class="section-header">
+                    <h2 class="section-title">Catégories d'Images</h2>
+                    <button class="upload-btn" id="addCategoryBtn">
+                        <i class="fas fa-plus"></i> Ajouter une catégorie
+                    </button>
+                </div>
+                <div class="section-content">
+                    <div class="categories-list">
+                        <!-- Le contenu sera généré dynamiquement par JavaScript -->
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Image Detail Modal -->
+    <div class="modal" id="imageDetailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Détails de l'image</h2>
+                <button class="modal-close" id="closeImageDetailModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="image-detail">
+                    <div class="image-preview">
+                        <img src="" alt="" class="preview-img" id="previewImg">
+                    </div>
+                    <div class="image-info-panel">
+                        <div class="info-group">
+                            <label class="info-label">Nom du fichier</label>
+                            <div class="info-value" id="fileName"></div>
+                        </div>
+                        <div class="info-group">
+                            <label class="info-label">Type</label>
+                            <div class="info-value" id="fileType"></div>
+                        </div>
+                        <div class="info-group">
+                            <label class="info-label">Taille</label>
+                            <div class="info-value" id="fileSize"></div>
+                        </div>
+                        <div class="info-group">
+                            <label class="info-label">Dimensions</label>
+                            <div class="info-value" id="fileDimensions"></div>
+                        </div>
+                        <div class="info-group">
+                            <label class="info-label">Date d'ajout</label>
+                            <div class="info-value" id="fileDate"></div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Texte alternatif</label>
+                            <input type="text" class="form-control" id="altText">
+                            <div class="form-helper">Description de l'image pour l'accessibilité</div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Catégorie</label>
+                            <select class="form-control" id="imageCategory">
+                                <option value="vehicles">Véhicules</option>
+                                <option value="interiors">Intérieurs</option>
+                                <option value="exteriors">Extérieurs</option>
+                                <option value="others">Autres</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="batch-btn" id="cancelImageDetail">Annuler</button>
+                <button class="upload-btn" id="saveImageDetail">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript - Système de gestion d'images dynamique -->
+    <script>
+    // ==============================================
+    // SYSTÈME DE GESTION D'IMAGES DYNAMIQUE
+    // ==============================================
+
+    // Structure des données dans localStorage
+    // images: Collection d'images avec métadonnées
+    // vehicles: Collection de véhicules avec leurs images associées
+    // categories: Collection de catégories d'images
+
+    // ==============================================
+    // GESTION DES DONNÉES
+    // ==============================================
+
+    // Modèle de données pour une nouvelle image
+    function createImageModel(file, metadata = {}) {
+    const id = 'img-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+    const fileName = file instanceof File ? file.name : (metadata.fileName || 'image.jpg');
+    const fileType = fileName.split('.').pop().toUpperCase();
+    
+    // Créer un objet image avec les métadonnées de base
+    const imageObject = {
+        id: id,
+        fileName: fileName,
+        alt: metadata.alt || fileName,
+        category: metadata.category || 'others',
+        type: fileType,
+        size: file instanceof File ? formatFileSize(file.size) : (metadata.size || 'Inconnu'),
+        dimensions: metadata.dimensions || 'Inconnu',
+        dateAdded: new Date().toISOString(),
+        vehicleId: metadata.vehicleId || null,
+        vehicleName: metadata.vehicleName || ''
+    };
+    
+    // Si une src est fournie dans les métadonnées, l'utiliser directement
+    if (metadata.src) {
+        imageObject.src = metadata.src;
+        return imageObject;
+    }
+    
+    // Sinon, si un fichier est fourni, convertir en Base64
+    if (file instanceof File) {
+        // Retourner une promesse avec l'objet image
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                // Assigner le résultat Base64 comme src
+                imageObject.src = e.target.result;
+                
+                // Déterminer les dimensions de l'image
+                const img = new Image();
+                img.onload = function() {
+                    imageObject.dimensions = `${img.width} × ${img.height}`;
+                    resolve(imageObject);
+                };
+                
+                img.onerror = function() {
+                    console.error("Erreur lors du chargement de l'image pour déterminer les dimensions");
+                    imageObject.dimensions = 'Inconnu';
+                    resolve(imageObject);
+                };
+                
+                img.src = e.target.result;
+            };
+            
+            reader.onerror = function() {
+                console.error("Erreur lors de la lecture du fichier");
+                reject(new Error("Erreur lors de la lecture du fichier"));
+            };
+            
+            // Lire le fichier comme une URL de données (Base64)
+            reader.readAsDataURL(file);
+        });
+    }
+    
+    return imageObject;
+}
+
+    // Formater la taille du fichier
+    function formatFileSize(bytes) {
+        if (bytes < 1024) return bytes + ' bytes';
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+        return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+
+    // Initialiser les données de base si elles n'existent pas
+    function initializeData() {
+        // Vérifier si les données existent déjà
+        if (!localStorage.getItem('autosenegal_images')) {
+            // Données d'images initiales
+            const initialImages = [];
+            
+            // Données de catégories initiales
+            const initialCategories = [
+                { id: 'vehicles', name: 'Véhicules', icon: 'fas fa-car', count: 0 },
+                { id: 'interiors', name: 'Intérieurs', icon: 'fas fa-couch', count: 0 },
+                { id: 'exteriors', name: 'Extérieurs', icon: 'fas fa-car-side', count: 0 },
+                { id: 'others', name: 'Autres', icon: 'fas fa-images', count: 0 }
+            ];
+            
+            // Données de véhicules initiales 
+            // (vides car vous allez les ajouter dynamiquement)
+            const initialVehicles = [];
+            
+            // Sauvegarder les données initiales
+            localStorage.setItem('autosenegal_images', JSON.stringify(initialImages));
+            localStorage.setItem('autosenegal_categories', JSON.stringify(initialCategories));
+            localStorage.setItem('autosenegal_vehicles', JSON.stringify(initialVehicles));
+        }
+    }
+
+    // Obtenir toutes les images
+    function getAllImages() {
+        const images = JSON.parse(localStorage.getItem('autosenegal_images') || '[]');
+        return images;
+    }
+
+    // Obtenir les images par catégorie
+    function getImagesByCategory(category) {
+        const images = getAllImages();
+        return category === 'all' ? images : images.filter(img => img.category === category);
+    }
+
+    // Obtenir les images par véhicule
+    function getImagesByVehicle(vehicleId) {
+        const images = getAllImages();
+        return images.filter(img => img.vehicleId === vehicleId);
+    }
+
+    // Ajouter une nouvelle image
+    async function addImage(file, metadata = {}) {
+    try {
+        // Créer un nouvel objet image (maintenant asynchrone)
+        const newImage = await createImageModel(file, metadata);
+        
+        // Récupérer et mettre à jour la collection d'images
+        const images = getAllImages();
+        images.push(newImage);
+        localStorage.setItem('autosenegal_images', JSON.stringify(images));
+        
+        // Mettre à jour le compteur de catégorie
+        updateCategoryCount(newImage.category, 1);
+        
+        // Si l'image est associée à un véhicule, mettre à jour le véhicule
+        if (newImage.vehicleId) {
+            addImageToVehicle(newImage.id, newImage.vehicleId);
+        }
+        
+        return newImage;
+    } catch (error) {
+        console.error("Erreur lors de l'ajout de l'image:", error);
+        return null;
+    }
+}
+
+    // Supprimer une image
+    function deleteImage(imageId) {
+        // Récupérer l'image
+        const images = getAllImages();
+        const imageIndex = images.findIndex(img => img.id === imageId);
+        
+        if (imageIndex === -1) return false;
+        
+        const deletedImage = images[imageIndex];
+        
+        // Supprimer l'image de la collection
+        images.splice(imageIndex, 1);
+        localStorage.setItem('autosenegal_images', JSON.stringify(images));
+        
+        // Mettre à jour le compteur de catégorie
+        updateCategoryCount(deletedImage.category, -1);
+        
+        // Si l'image était associée à un véhicule, mettre à jour le véhicule
+        if (deletedImage.vehicleId) {
+            removeImageFromVehicle(imageId, deletedImage.vehicleId);
+        }
+        
+        return true;
+    }
+
+    // Mettre à jour une image
+    function updateImage(imageId, updates) {
+        // Récupérer l'image
+        const images = getAllImages();
+        const imageIndex = images.findIndex(img => img.id === imageId);
+        
+        if (imageIndex === -1) return false;
+        
+        const oldImage = {...images[imageIndex]};
+        
+        // Mettre à jour l'image
+        images[imageIndex] = {...oldImage, ...updates};
+        localStorage.setItem('autosenegal_images', JSON.stringify(images));
+        
+        // Si la catégorie a changé, mettre à jour les compteurs
+        if (updates.category && updates.category !== oldImage.category) {
+            updateCategoryCount(oldImage.category, -1);
+            updateCategoryCount(updates.category, 1);
+        }
+        
+        // Si le véhicule a changé, mettre à jour les associations
+        if (updates.vehicleId && updates.vehicleId !== oldImage.vehicleId) {
+            if (oldImage.vehicleId) {
+                removeImageFromVehicle(imageId, oldImage.vehicleId);
+            }
+            if (updates.vehicleId) {
+                addImageToVehicle(imageId, updates.vehicleId);
+            }
+        }
+        
+        return images[imageIndex];
+    }
+
+    // Obtenir toutes les catégories
+    function getAllCategories() {
+        const categories = JSON.parse(localStorage.getItem('autosenegal_categories') || '[]');
+        return categories;
+    }
+
+    // Mettre à jour le compteur d'une catégorie
+    function updateCategoryCount(categoryId, delta) {
+        const categories = getAllCategories();
+        const categoryIndex = categories.findIndex(cat => cat.id === categoryId);
+        
+        if (categoryIndex === -1) return false;
+        
+        categories[categoryIndex].count += delta;
+        if (categories[categoryIndex].count < 0) categories[categoryIndex].count = 0;
+        
+        localStorage.setItem('autosenegal_categories', JSON.stringify(categories));
+        return true;
+    }
+
+    // Obtenir tous les véhicules
+    function getAllVehicles() {
+        const vehicles = JSON.parse(localStorage.getItem('autosenegal_vehicles') || '[]');
+        return vehicles;
+    }
+
+    // Ajouter une image à un véhicule
+    function addImageToVehicle(imageId, vehicleId) {
+        const vehicles = getAllVehicles();
+        const vehicleIndex = vehicles.findIndex(v => v.id === vehicleId);
+        
+        if (vehicleIndex === -1) return false;
+        
+        if (!vehicles[vehicleIndex].images) {
+            vehicles[vehicleIndex].images = [];
+        }
+        
+        if (!vehicles[vehicleIndex].images.includes(imageId)) {
+            vehicles[vehicleIndex].images.push(imageId);
+            localStorage.setItem('autosenegal_vehicles', JSON.stringify(vehicles));
+        }
+        
+        return true;
+    }
+
+    // Supprimer une image d'un véhicule
+    function removeImageFromVehicle(imageId, vehicleId) {
+        const vehicles = getAllVehicles();
+        const vehicleIndex = vehicles.findIndex(v => v.id === vehicleId);
+        
+        if (vehicleIndex === -1 || !vehicles[vehicleIndex].images) return false;
+        
+        const imageIndex = vehicles[vehicleIndex].images.indexOf(imageId);
+        if (imageIndex > -1) {
+            vehicles[vehicleIndex].images.splice(imageIndex, 1);
+            localStorage.setItem('autosenegal_vehicles', JSON.stringify(vehicles));
+        }
+        
+        return true;
+    }
+
+    // ==============================================
+    // INTERFACE UTILISATEUR
+    // ==============================================
+
+    // Générer la galerie d'images
+    function renderImageGallery(category = 'all') {
+        const imageGallery = document.querySelector('.image-gallery');
+        if (!imageGallery) return;
+        
+        // Vider la galerie
+        imageGallery.innerHTML = '';
+        
+        // Obtenir les images à afficher
+        const images = getImagesByCategory(category);
+        
+        if (images.length === 0) {
+            // Afficher un message si aucune image n'est disponible
+            imageGallery.innerHTML = `
+                <div class="empty-gallery">
+                    <i class="fas fa-images" style="font-size: 3rem; color: #ccc; margin-bottom: 15px;"></i>
+                    <p>Aucune image disponible dans cette catégorie.</p>
+                    <p>Utilisez le bouton "Parcourir les fichiers" pour ajouter des images.</p>
+                </div>
+            `;
+            return;
+        }
+        
+        // Générer une carte pour chaque image
+        images.forEach(image => {
+            const imageCard = createImageCard(image);
+            imageGallery.appendChild(imageCard);
+        });
+        
+        // Mettre à jour le compteur d'images sélectionnées
+        updateSelectedCount();
+    }
+
+    // Créer une carte d'image
+    function createImageCard(image) {
+        // Créer l'élément div pour la carte
+        const card = document.createElement('div');
+        card.className = 'image-card';
+        card.setAttribute('data-category', image.category);
+        card.setAttribute('data-id', image.id);
+        
+        // Définir le contenu HTML de la carte
+        card.innerHTML = `
+            <img src="${image.src}" alt="${image.alt}" class="image-thumbnail">
+            <div class="image-checkbox" data-id="${image.id}"></div>
+            <div class="image-actions">
+                <button class="image-action" title="Voir" data-image-id="${image.id}"><i class="fas fa-eye"></i></button>
+                <button class="image-action" title="Éditer" data-image-id="${image.id}"><i class="fas fa-edit"></i></button>
+                <button class="image-action" title="Supprimer" data-image-id="${image.id}"><i class="fas fa-trash-alt"></i></button>
+            </div>
+            <div class="image-info">
+                <h3 class="image-title">${image.fileName}</h3>
+                <div class="image-meta">
+                    <span>${image.type} • ${image.size}</span>
+                    <span>${image.dimensions}</span>
+                </div>
+            </div>
+        `;
+        
+        // Configurer les événements pour les boutons d'action
+        setupImageCardEvents(card);
+        
+        return card;
+    }
+
+    // Configurer les événements pour une carte d'image
+    function setupImageCardEvents(cardElement) {
+        // Checkbox pour sélection
+        const checkbox = cardElement.querySelector('.image-checkbox');
+        if (checkbox) {
+            checkbox.addEventListener('click', function() {
+                this.classList.toggle('checked');
+                updateSelectedCount();
+            });
+        }
+        
+        // Boutons d'action
+        const actionButtons = cardElement.querySelectorAll('.image-action');
+        actionButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const action = this.getAttribute('title');
+                const imageId = this.getAttribute('data-image-id');
+                
+                handleImageAction(action, imageId, this);
+            });
+        });
+    }
+
+    // Mettre à jour les cartes de catégories
+    function renderCategoryCards() {
+        const categoriesList = document.querySelector('.categories-list');
+        if (!categoriesList) return;
+        
+        // Vider la liste
+        categoriesList.innerHTML = '';
+        
+        // Obtenir les catégories
+        const categories = getAllCategories();
+        
+        // Générer une carte pour chaque catégorie
+        categories.forEach(category => {
+            const categoryCard = document.createElement('div');
+            categoryCard.className = 'category-card';
+            categoryCard.innerHTML = `
+                <div class="category-icon">
+                    <i class="${category.icon}"></i>
+                </div>
+                <h3 class="category-title">${category.name}</h3>
+                <div class="category-count">${category.count} image${category.count !== 1 ? 's' : ''}</div>
+            `;
+            categoriesList.appendChild(categoryCard);
+        });
+    }
+
+    // Mettre à jour le compteur d'images sélectionnées
+    function updateSelectedCount() {
+        const checkedBoxes = document.querySelectorAll('.image-checkbox.checked');
+        const countElement = document.querySelector('.selected-count');
+        const batchButtons = document.querySelectorAll('.batch-buttons button');
+        
+        if (countElement) {
+            const count = checkedBoxes.length;
+            countElement.textContent = `${count} image${count !== 1 ? 's' : ''} sélectionnée${count !== 1 ? 's' : ''}`;
+        }
+        
+        // Activer/désactiver les boutons d'action par lot
+        batchButtons.forEach(button => {
+            button.disabled = checkedBoxes.length === 0;
+        });
+    }
+
+    // Gérer l'action sur une image
+    function handleImageAction(action, imageId, buttonElement) {
+        const images = getAllImages();
+        const image = images.find(img => img.id === imageId);
+        
+        if (!image) return;
+        
+        switch(action) {
+            case 'Voir':
+                openImageDetailModal(image);
+                break;
+            case 'Éditer':
+                openImageEditModal(image);
+                break;
+            case 'Supprimer':
+                confirmImageDeletion(image, buttonElement);
+                break;
+        }
+    }
+
+    // Ouvrir le modal de détails d'image
+    function openImageDetailModal(image) {
+        const modal = document.getElementById('imageDetailModal');
+        if (!modal) return;
+        
+        // Mettre à jour le contenu du modal
+        const previewImg = document.getElementById('previewImg');
+        const fileName = document.getElementById('fileName');
+        const fileType = document.getElementById('fileType');
+        const fileSize = document.getElementById('fileSize');
+        const fileDimensions = document.getElementById('fileDimensions');
+        const altText = document.getElementById('altText');
+        const imageCategory = document.getElementById('imageCategory');
+        
+        if (previewImg) previewImg.src = image.src;
+        if (fileName) fileName.textContent = image.fileName;
+        if (fileType) fileType.textContent = image.type;
+        if (fileSize) fileSize.textContent = image.size;
+        if (fileDimensions) fileDimensions.textContent = image.dimensions;
+        if (altText) altText.value = image.alt;
+        if (imageCategory) {
+            const options = imageCategory.querySelectorAll('option');
+            options.forEach(option => {
+                option.selected = option.value === image.category;
+            });
+        }
+        
+        // Ajouter l'ID de l'image au modal pour le récupérer lors de la sauvegarde
+        modal.setAttribute('data-image-id', image.id);
+        
+        // Afficher le modal
+        modal.classList.add('active');
+    }
+
+    // Ouvrir le modal d'édition d'image
+    function openImageEditModal(image) {
+        // Utiliser le même modal que pour les détails
+        openImageDetailModal(image);
+    }
+
+    // Confirmer la suppression d'une image
+    function confirmImageDeletion(image, buttonElement) {
+        if (confirm(`Êtes-vous sûr de vouloir supprimer l'image "${image.fileName}" ?`)) {
+            // Supprimer l'image de la base de données
+            const success = deleteImage(image.id);
+            
+            if (success) {
+                // Supprimer la carte de l'image de l'interface
+                const imageCard = buttonElement.closest('.image-card');
+                if (imageCard) {
+                    imageCard.remove();
+                }
+                
+                // Mettre à jour les catégories
+                renderCategoryCards();
+                
+                alert(`Image "${image.fileName}" supprimée avec succès!`);
+            } else {
+                alert("Erreur lors de la suppression de l'image.");
+            }
+        }
+    }
+
+    // Gérer la soumission du formulaire d'édition d'image
+    function handleImageFormSubmit(event) {
+        event.preventDefault();
+        
+        const modal = document.getElementById('imageDetailModal');
+        if (!modal) return;
+        
+        const imageId = modal.getAttribute('data-image-id');
+        if (!imageId) return;
+        
+        // Récupérer les nouvelles valeurs
+        const altText = document.getElementById('altText')?.value;
+        const imageCategory = document.getElementById('imageCategory')?.value;
+        
+        // Mettre à jour l'image
+        const updatedImage = updateImage(imageId, {
+            alt: altText,
+            category: imageCategory
+        });
+        
+        if (updatedImage) {
+            // Mettre à jour l'interface
+            renderImageGallery();
+            renderCategoryCards();
+            
+            // Fermer le modal
+            modal.classList.remove('active');
+            
+            alert('Modifications enregistrées avec succès!');
+        } else {
+            alert("Erreur lors de la mise à jour de l'image.");
+        }
+    }
+
+    // Gérer l'upload de fichiers
+   // Modifier la fonction handleFileUpload pour gérer l'asynchronicité
+async function handleFileUpload(files) {
+    if (!files || files.length === 0) return;
+    
+    // Vérifier le type et la taille des fichiers
+    const validFiles = Array.from(files).filter(file => 
+        file.type.startsWith('image/') && file.size <= 10 * 1024 * 1024 // Limite à 10 Mo
+    );
+    
+    if (validFiles.length === 0) {
+        alert('Aucun fichier valide sélectionné. Les fichiers doivent être des images de moins de 10 Mo.');
+        return;
+    }
+    
+    // Afficher une popup pour sélectionner la catégorie
+    const category = prompt('Sélectionnez une catégorie pour ces images :\n- vehicles\n- interiors\n- exteriors\n- others', 'vehicles');
+    if (!category) return;
+    
+    // Si l'utilisateur a sélectionné une catégorie valide
+    if (['vehicles', 'interiors', 'exteriors', 'others'].includes(category)) {
+        // Afficher un indicateur de chargement
+        showLoading(true, `Chargement de ${validFiles.length} image(s)...`);
+        
+        try {
+            // Ajouter chaque fichier
+            const addedImages = [];
+            
+            // Utiliser une boucle for...of pour gérer l'asynchronicité
+            for (const file of validFiles) {
+                // Ajouter l'image avec des métadonnées de base
+                const metadata = {
+                    category: category,
+                    alt: file.name.replace(/\.[^/.]+$/, '') // Nom du fichier sans extension
+                };
+                
+                const newImage = await addImage(file, metadata);
+                if (newImage) {
+                    addedImages.push(newImage);
+                }
+            }
+            
+            // Mettre à jour l'interface
+            renderImageGallery();
+            renderCategoryCards();
+            
+            alert(`${addedImages.length} image(s) ajoutée(s) avec succès!`);
+        } catch (error) {
+            console.error("Erreur lors du traitement des fichiers:", error);
+            alert("Une erreur s'est produite lors du chargement des images.");
+        } finally {
+            // Masquer l'indicateur de chargement
+            showLoading(false);
+        }
+    } else {
+        alert('Catégorie non valide. Veuillez sélectionner une catégorie parmi: vehicles, interiors, exteriors, others.');
+    }
+}
+
+// Fonction pour afficher/masquer un indicateur de chargement
+function showLoading(show, message = "Chargement...") {
+    let loadingElement = document.getElementById('loading-indicator');
+    
+    // Si l'élément n'existe pas, le créer
+    if (!loadingElement && show) {
+        loadingElement = document.createElement('div');
+        loadingElement.id = 'loading-indicator';
+        loadingElement.style.position = 'fixed';
+        loadingElement.style.top = '0';
+        loadingElement.style.left = '0';
+        loadingElement.style.width = '100%';
+        loadingElement.style.height = '100%';
+        loadingElement.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+        loadingElement.style.display = 'flex';
+        loadingElement.style.justifyContent = 'center';
+        loadingElement.style.alignItems = 'center';
+        loadingElement.style.zIndex = '9999';
+        
+        const loadingContent = document.createElement('div');
+        loadingContent.style.backgroundColor = 'white';
+        loadingContent.style.padding = '20px';
+        loadingContent.style.borderRadius = '10px';
+        loadingContent.style.textAlign = 'center';
+        
+        const spinner = document.createElement('div');
+        spinner.innerHTML = '<i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: #007C5A; margin-bottom: 10px;"></i>';
+        
+        const messageElement = document.createElement('p');
+        messageElement.id = 'loading-message';
+        messageElement.textContent = message;
+        
+        loadingContent.appendChild(spinner);
+        loadingContent.appendChild(messageElement);
+        loadingElement.appendChild(loadingContent);
+        
+        document.body.appendChild(loadingElement);
+    } else if (loadingElement) {
+        if (show) {
+            // Mettre à jour le message si nécessaire
+            const messageElement = loadingElement.querySelector('#loading-message');
+            if (messageElement) {
+                messageElement.textContent = message;
+            }
+            
+            loadingElement.style.display = 'flex';
+        } else {
+            loadingElement.style.display = 'none';
+        }
+    }
+}
+
+// Modifier la gestion des erreurs d'image
+function setupImageErrorHandler(imgElement) {
+    imgElement.addEventListener('error', function() {
+        console.warn(`Impossible de charger l'image: ${this.src}`);
+        
+        // Vérifier si c'est une image en Base64
+        if (this.src.startsWith('data:image/')) {
+            console.log("L'image est en Base64 mais ne peut pas être chargée, peut-être corrompue");
+        }
+        
+        // Remplacer par un placeholder
+        this.src = 'https://via.placeholder.com/150x100?text=' + encodeURIComponent('Image non disponible');
+        this.classList.add('broken-image');
+    });
+}
+
+    // ==============================================
+    // INITIALISATION
+    // ==============================================
+
+    // Fonction principale d'initialisation
+    function initializeDynamicImageManagement() {
+        console.log("Initialisation du gestionnaire d'images dynamique...");
+        
+        // Initialiser les données si nécessaire
+        initializeData();
+        
+        // Configurer l'interface utilisateur
+        setupUI();
+        
+        // Rendre les éléments d'interface initiaux
+        renderImageGallery();
+        renderCategoryCards();
+        
+        console.log("Gestionnaire d'images dynamique initialisé avec succès!");
+    }
+
+    // Configurer l'interface utilisateur
+    function setupUI() {
+        // Configuration des onglets de catégorie
+        setupTabs();
+        
+        // Configuration de l'upload de fichiers
+        setupFileUpload();
+        
+        // Configuration des actions par lot
+        setupBatchActions();
+        
+        // Configuration des modals
+        setupModals();
+        
+        // Configuration de la recherche
+        setupSearch();
+    }
+
+    // Configurer les onglets
+    function setupTabs() {
+        const tabs = document.querySelectorAll('.tab');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Retirer la classe active de tous les onglets
+                tabs.forEach(t => t.classList.remove('active'));
+                
+                // Ajouter la classe active à l'onglet cliqué
+                this.classList.add('active');
+                
+                // Filtrer les images par catégorie
+                const category = this.getAttribute('data-tab');
+                renderImageGallery(category);
+            });
+        });
+    }
+
+    // Configurer l'upload de fichiers
+    function setupFileUpload() {
+        const uploadArea = document.getElementById('uploadArea');
+        const browseFiles = document.getElementById('browseFiles');
+        const fileInput = document.getElementById('fileInput');
+        
+        if (browseFiles && fileInput) {
+            browseFiles.addEventListener('click', () => {
+                fileInput.click();
+            });
+        }
+        
+        if (fileInput) {
+            fileInput.addEventListener('change', () => {
+                if (fileInput.files.length > 0) {
+                    handleFileUpload(fileInput.files);
+                }
+            });
+        }
+        
+        if (uploadArea) {
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = '#007C5A';
+                uploadArea.style.backgroundColor = 'rgba(0, 124, 90, 0.05)';
+            });
+            
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.style.borderColor = 'rgba(0, 0, 0, 0.1)';
+                uploadArea.style.backgroundColor = '#F5F5F5';
+            });
+            
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = 'rgba(0, 0, 0, 0.1)';
+                uploadArea.style.backgroundColor = '#F5F5F5';
+                
+                if (e.dataTransfer.files.length > 0) {
+                    handleFileUpload(e.dataTransfer.files);
+                }
+            });
+        }
+    }
+
+    // Configurer les actions par lot
+    function setupBatchActions() {
+        const assignCategoryBtn = document.getElementById('assignCategoryBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+        
+        if (assignCategoryBtn) {
+            assignCategoryBtn.addEventListener('click', () => {
+                const checkedBoxes = document.querySelectorAll('.image-checkbox.checked');
+                if (checkedBoxes.length === 0) return;
+                
+                const category = prompt('Sélectionnez une catégorie: vehicles, interiors, exteriors, others');
+                if (category && ['vehicles', 'interiors', 'exteriors', 'others'].includes(category)) {
+                    let updatedCount = 0;
+                    
+                    checkedBoxes.forEach(checkbox => {
+                        const imageId = checkbox.getAttribute('data-id');
+                        if (updateImage(imageId, { category })) {
+                            updatedCount++;
+                        }
+                    });
+                    
+                    // Mettre à jour l'interface
+                    renderImageGallery();
+                    renderCategoryCards();
+                    
+                    alert(`${updatedCount} image(s) assignée(s) à la catégorie "${category}"`);
+                } else if (category) {
+                    alert('Catégorie non valide. Veuillez sélectionner une catégorie parmi: vehicles, interiors, exteriors, others.');
+                }
+            });
+        }
+        
+        if (downloadBtn) {
+            downloadBtn.addEventListener('click', () => {
+                const checkedBoxes = document.querySelectorAll('.image-checkbox.checked');
+                if (checkedBoxes.length === 0) return;
+                
+                // Dans une application réelle, vous pourriez créer un zip
+                // Pour cette démo, nous ouvrons simplement chaque image dans un nouvel onglet
+                const images = getAllImages();
+                
+                checkedBoxes.forEach(checkbox => {
+                    const imageId = checkbox.getAttribute('data-id');
+                    const image = images.find(img => img.id === imageId);
+                    
+                    if (image && image.src) {
+                        window.open(image.src, '_blank');
+                    }
+                });
+                
+                alert(`${checkedBoxes.length} image(s) ouvertes pour téléchargement.`);
+            });
+        }
+        
+        if (deleteSelectedBtn) {
+            deleteSelectedBtn.addEventListener('click', () => {
+                const checkedBoxes = document.querySelectorAll('.image-checkbox.checked');
+                if (checkedBoxes.length === 0) return;
+                
+                if (confirm(`Êtes-vous sûr de vouloir supprimer ${checkedBoxes.length} image(s) ?`)) {
+                    let deletedCount = 0;
+                    
+                    // Collecter tous les IDs d'abord pour éviter les problèmes lors de la suppression
+                    const imageIds = Array.from(checkedBoxes).map(checkbox => 
+                        checkbox.getAttribute('data-id')
+                    );
+                    
+                    // Supprimer chaque image
+                    imageIds.forEach(imageId => {
+                        if (deleteImage(imageId)) {
+                            deletedCount++;
+                        }
+                    });
+                    
+                    // Mettre à jour l'interface
+                    renderImageGallery();
+                    renderCategoryCards();
+                    
+                    alert(`${deletedCount} image(s) supprimée(s) avec succès!`);
+                }
+            });
+        }
+    }
+
+    // Configurer les modals
+    function setupModals() {
+        const imageDetailModal = document.getElementById('imageDetailModal');
+        const closeImageDetailModal = document.getElementById('closeImageDetailModal');
+        const cancelImageDetail = document.getElementById('cancelImageDetail');
+        const saveImageDetail = document.getElementById('saveImageDetail');
+        
+        if (closeImageDetailModal && imageDetailModal) {
+            closeImageDetailModal.addEventListener('click', () => {
+                imageDetailModal.classList.remove('active');
+            });
+        }
+        
+        if (cancelImageDetail && imageDetailModal) {
+            cancelImageDetail.addEventListener('click', () => {
+                imageDetailModal.classList.remove('active');
+            });
+        }
+        
+        if (saveImageDetail && imageDetailModal) {
+            saveImageDetail.addEventListener('click', handleImageFormSubmit);
+        }
+        
+        // Fermer les modals en cliquant à l'extérieur
+        window.addEventListener('click', (e) => {
+            if (imageDetailModal && e.target === imageDetailModal) {
+                imageDetailModal.classList.remove('active');
+            }
+        });
+    }
+
+    // Configurer la recherche
+    function setupSearch() {
+        const searchInput = document.querySelector('.search-bar input');
+        
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                const searchText = this.value.toLowerCase();
+                
+                // Obtenir tous les éléments de carte d'image
+                const imageCards = document.querySelectorAll('.image-card');
+                
+                // Si le champ est vide, afficher toutes les cartes
+                if (searchText === '') {
+                    imageCards.forEach(card => {
+                        card.style.display = '';
+                    });
+                    return;
+                }
+                
+                // Filtrer les cartes par texte de recherche
+                imageCards.forEach(card => {
+                    const titleElement = card.querySelector('.image-title');
+                    const metaElement = card.querySelector('.image-meta');
+                    
+                    if (!titleElement) return;
+                    
+                    const title = titleElement.textContent.toLowerCase();
+                    const meta = metaElement ? metaElement.textContent.toLowerCase() : '';
+                    
+                    if (title.includes(searchText) || meta.includes(searchText)) {
+                        card.style.display = '';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        }
+    }
+
+    // Initialiser quand le DOM est chargé
+    document.addEventListener('DOMContentLoaded', initializeDynamicImageManagement);
+   
+   // ==============================================
+// SERVICE DE DONNÉES PARTAGÉES
+// ==============================================
+// Ce script doit être inclus dans toutes les pages (index.html, admin-panel.html, image-management.html)
+
+// Clés de stockage localStorage
+const STORAGE_KEYS = {
+    IMAGES: 'autosenegal_images',
+    VEHICLES: 'autosenegal_vehicles',
+    CATEGORIES: 'autosenegal_categories',
+    SETTINGS: 'autosenegal_settings'
+};
+
+// Service de gestion des données
+const DataService = {
+    // Initialiser les données si elles n'existent pas
+    init: function() {
+        // Images
+        if (!localStorage.getItem(STORAGE_KEYS.IMAGES)) {
+            localStorage.setItem(STORAGE_KEYS.IMAGES, JSON.stringify([]));
+        }
+        
+        // Véhicules
+        if (!localStorage.getItem(STORAGE_KEYS.VEHICLES)) {
+            localStorage.setItem(STORAGE_KEYS.VEHICLES, JSON.stringify([]));
+        }
+        
+        // Catégories d'images
+        if (!localStorage.getItem(STORAGE_KEYS.CATEGORIES)) {
+            const defaultCategories = [
+                { id: 'vehicles', name: 'Véhicules', icon: 'fas fa-car', count: 0 },
+                { id: 'interiors', name: 'Intérieurs', icon: 'fas fa-couch', count: 0 },
+                { id: 'exteriors', name: 'Extérieurs', icon: 'fas fa-car-side', count: 0 },
+                { id: 'others', name: 'Autres', icon: 'fas fa-images', count: 0 }
+            ];
+            localStorage.setItem(STORAGE_KEYS.CATEGORIES, JSON.stringify(defaultCategories));
+        }
+        
+        // Paramètres
+        if (!localStorage.getItem(STORAGE_KEYS.SETTINGS)) {
+            localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify({
+                siteName: 'AutoSénégal',
+                currency: 'FCFA',
+                language: 'fr'
+            }));
+        }
+        
+        console.log('DataService: Données initialisées');
+    },
+    
+    // =============== GESTION DES IMAGES ===============
+    
+    // Récupérer toutes les images
+    getAllImages: function() {
+        return JSON.parse(localStorage.getItem(STORAGE_KEYS.IMAGES) || '[]');
+    },
+    
+    // Récupérer les images par catégorie
+    getImagesByCategory: function(category) {
+        const images = this.getAllImages();
+        return category === 'all' ? images : images.filter(img => img.category === category);
+    },
+    
+    // Récupérer les images par véhicule
+    getImagesByVehicle: function(vehicleId) {
+        const images = this.getAllImages();
+        return images.filter(img => img.vehicleId === vehicleId);
+    },
+    
+    // Récupérer une image par ID
+    getImageById: function(imageId) {
+        const images = this.getAllImages();
+        return images.find(img => img.id === imageId);
+    },
+    
+    // Ajouter une image
+    addImage: function(imageData) {
+        const images = this.getAllImages();
+        
+        // Générer un ID si non fourni
+        if (!imageData.id) {
+            imageData.id = 'img-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+        }
+        
+        // Ajouter date si non fournie
+        if (!imageData.dateAdded) {
+            imageData.dateAdded = new Date().toISOString();
+        }
+        
+        images.push(imageData);
+        localStorage.setItem(STORAGE_KEYS.IMAGES, JSON.stringify(images));
+        
+        // Mettre à jour le compteur de catégorie
+        this.updateCategoryCount(imageData.category, 1);
+        
+        return imageData;
+    },
+    
+    // Mettre à jour une image
+    updateImage: function(imageId, updates) {
+        const images = this.getAllImages();
+        const index = images.findIndex(img => img.id === imageId);
+        
+        if (index === -1) return null;
+        
+        const oldImage = images[index];
+        const updatedImage = {...oldImage, ...updates};
+        
+        // Si la catégorie a changé, mettre à jour les compteurs
+        if (updates.category && updates.category !== oldImage.category) {
+            this.updateCategoryCount(oldImage.category, -1);
+            this.updateCategoryCount(updates.category, 1);
+        }
+        
+        // Si le véhicule a changé, mettre à jour les associations
+        if (updates.vehicleId !== undefined && updates.vehicleId !== oldImage.vehicleId) {
+            if (oldImage.vehicleId) {
+                this.removeImageFromVehicle(imageId, oldImage.vehicleId);
+            }
+            if (updates.vehicleId) {
+                this.addImageToVehicle(imageId, updates.vehicleId);
+            }
+        }
+        
+        images[index] = updatedImage;
+        localStorage.setItem(STORAGE_KEYS.IMAGES, JSON.stringify(images));
+        
+        return updatedImage;
+    },
+    
+    // Supprimer une image
+    deleteImage: function(imageId) {
+        const images = this.getAllImages();
+        const index = images.findIndex(img => img.id === imageId);
+        
+        if (index === -1) return false;
+        
+        const deletedImage = images[index];
+        images.splice(index, 1);
+        localStorage.setItem(STORAGE_KEYS.IMAGES, JSON.stringify(images));
+        
+        // Mettre à jour le compteur de catégorie
+        this.updateCategoryCount(deletedImage.category, -1);
+        
+        // Si l'image était liée à un véhicule, mettre à jour
+        if (deletedImage.vehicleId) {
+            this.removeImageFromVehicle(imageId, deletedImage.vehicleId);
+        }
+        
+        return true;
+    },
+    
+    // =============== GESTION DES CATÉGORIES ===============
+    
+    // Récupérer toutes les catégories
+    getAllCategories: function() {
+        return JSON.parse(localStorage.getItem(STORAGE_KEYS.CATEGORIES) || '[]');
+    },
+    
+    // Mettre à jour le compteur d'une catégorie
+    updateCategoryCount: function(categoryId, delta) {
+        const categories = this.getAllCategories();
+        const index = categories.findIndex(cat => cat.id === categoryId);
+        
+        if (index === -1) return false;
+        
+        categories[index].count += delta;
+        if (categories[index].count < 0) categories[index].count = 0;
+        
+        localStorage.setItem(STORAGE_KEYS.CATEGORIES, JSON.stringify(categories));
+        return true;
+    },
+    
+    // =============== GESTION DES VÉHICULES ===============
+    
+    // Récupérer tous les véhicules
+    getAllVehicles: function() {
+        return JSON.parse(localStorage.getItem(STORAGE_KEYS.VEHICLES) || '[]');
+    },
+    
+    // Récupérer un véhicule par ID
+    getVehicleById: function(vehicleId) {
+        const vehicles = this.getAllVehicles();
+        return vehicles.find(v => v.id === vehicleId);
+    },
+    
+    // Ajouter un véhicule
+    addVehicle: function(vehicleData) {
+        const vehicles = this.getAllVehicles();
+        
+        // Générer un ID si non fourni
+        if (!vehicleData.id) {
+            vehicleData.id = 'vehicle-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+        }
+        
+        // Initialiser le tableau d'images si non fourni
+        if (!vehicleData.images) {
+            vehicleData.images = [];
+        }
+        
+        // Ajouter date si non fournie
+        if (!vehicleData.dateAdded) {
+            vehicleData.dateAdded = new Date().toISOString();
+        }
+        
+        vehicles.push(vehicleData);
+        localStorage.setItem(STORAGE_KEYS.VEHICLES, JSON.stringify(vehicles));
+        
+        return vehicleData;
+    },
+    
+    // Mettre à jour un véhicule
+    updateVehicle: function(vehicleId, updates) {
+        const vehicles = this.getAllVehicles();
+        const index = vehicles.findIndex(v => v.id === vehicleId);
+        
+        if (index === -1) return null;
+        
+        const updatedVehicle = {...vehicles[index], ...updates};
+        vehicles[index] = updatedVehicle;
+        
+        localStorage.setItem(STORAGE_KEYS.VEHICLES, JSON.stringify(vehicles));
+        return updatedVehicle;
+    },
+    
+    // Supprimer un véhicule
+    deleteVehicle: function(vehicleId) {
+        const vehicles = this.getAllVehicles();
+        const index = vehicles.findIndex(v => v.id === vehicleId);
+        
+        if (index === -1) return false;
+        
+        // Récupérer les images associées pour mettre à jour leurs associations
+        const vehicleImages = this.getImagesByVehicle(vehicleId);
+        
+        // Supprimer le véhicule
+        vehicles.splice(index, 1);
+        localStorage.setItem(STORAGE_KEYS.VEHICLES, JSON.stringify(vehicles));
+        
+        // Mettre à jour les images associées
+        vehicleImages.forEach(img => {
+            this.updateImage(img.id, {vehicleId: null, vehicleName: ''});
+        });
+        
+        return true;
+    },
+    
+    // Ajouter une image à un véhicule
+    addImageToVehicle: function(imageId, vehicleId) {
+        const vehicles = this.getAllVehicles();
+        const vehicleIndex = vehicles.findIndex(v => v.id === vehicleId);
+        
+        if (vehicleIndex === -1) return false;
+        
+        // Initialiser le tableau d'images si nécessaire
+        if (!vehicles[vehicleIndex].images) {
+            vehicles[vehicleIndex].images = [];
+        }
+        
+        // Ajouter l'ID de l'image s'il n'existe pas déjà
+        if (!vehicles[vehicleIndex].images.includes(imageId)) {
+            vehicles[vehicleIndex].images.push(imageId);
+            localStorage.setItem(STORAGE_KEYS.VEHICLES, JSON.stringify(vehicles));
+            
+            // Mettre à jour l'image avec les infos du véhicule
+            const vehicle = vehicles[vehicleIndex];
+            this.updateImage(imageId, {
+                vehicleId: vehicleId,
+                vehicleName: `${vehicle.make} ${vehicle.model} ${vehicle.year || ''}`
+            });
+        }
+        
+        return true;
+    },
+    
+    // Supprimer une image d'un véhicule
+    removeImageFromVehicle: function(imageId, vehicleId) {
+        const vehicles = this.getAllVehicles();
+        const vehicleIndex = vehicles.findIndex(v => v.id === vehicleId);
+        
+        if (vehicleIndex === -1 || !vehicles[vehicleIndex].images) return false;
+        
+        const imageIndex = vehicles[vehicleIndex].images.indexOf(imageId);
+        if (imageIndex > -1) {
+            vehicles[vehicleIndex].images.splice(imageIndex, 1);
+            localStorage.setItem(STORAGE_KEYS.VEHICLES, JSON.stringify(vehicles));
+            
+            // Mettre à jour l'image pour supprimer l'association
+            this.updateImage(imageId, {vehicleId: null, vehicleName: ''});
+        }
+        
+        return true;
+    },
+    
+    // =============== UTILITAIRES ===============
+    
+    // Formatter la taille de fichier
+    formatFileSize: function(bytes) {
+        if (bytes === undefined || bytes === null) return 'Inconnu';
+        if (bytes === 0) return '0 Bytes';
+        
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+    },
+    
+    // Vider toutes les données (pour tests)
+    clearAllData: function() {
+        localStorage.removeItem(STORAGE_KEYS.IMAGES);
+        localStorage.removeItem(STORAGE_KEYS.VEHICLES);
+        localStorage.removeItem(STORAGE_KEYS.CATEGORIES);
+        this.init();
+    }
+};
+
+// Initialiser le service de données au chargement
+document.addEventListener('DOMContentLoaded', function() {
+    DataService.init();
+});</script>
+</body>
+</html>
